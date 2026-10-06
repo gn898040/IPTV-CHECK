@@ -24,7 +24,7 @@ jobs:
           pip install requests
 
       - name: Run IPTV Checker
-        run: python checker.py
+        run: python checker2.py
 
       - name: Commit & Push changes
         run: |
