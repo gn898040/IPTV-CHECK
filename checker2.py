@@ -4,10 +4,10 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # --- 設定區 ---
 M3U_SOURCES = [
-  #  {
-  #      "url": "https://raw.githubusercontent.com/CCSH/IPTV/refs/heads/main/live.m3u",
-  #      "group": None  # 保留原分類
-  #  },
+    {
+        "url": "https://raw.githubusercontent.com/CCSH/IPTV/refs/heads/main/live.m3u",
+        "group": None  # 保留原分類
+    },
     {
         "url": "https://iptv-org.github.io/iptv/countries/tw.m3u",
         "group": "TW"  # 保留原分類
