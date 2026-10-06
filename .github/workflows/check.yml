@@ -30,6 +30,6 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add Playlist.m3u
-          git commit -m "Auto update Playlist.m3u" || exit 0
+          git add Playlist2.m3u
+          git commit -m "Auto update Playlist2.m3u" || exit 0
           git push
