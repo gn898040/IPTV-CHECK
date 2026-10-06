@@ -1,4 +1,5 @@
 import os
+import re
 import requests
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
@@ -10,7 +11,7 @@ M3U_SOURCES = [
     },
     {
         "url": "https://iptv-org.github.io/iptv/countries/tw.m3u",
-        "group": "TW"  # 保留原分類
+        "group": "TW"  # 強制分類為 TW
     },
     {
         "url": "https://gist.githubusercontent.com/tony881025/4ed30002f87b9e4231f47a0a6334d110/raw/4ef0d06fdd1f10411b700957aed714ee94318919/gistfile1.txt",
@@ -18,7 +19,7 @@ M3U_SOURCES = [
     }
 ]
 
-OUTPUT_M3U = "Playlist2.m3u"     # 輸出的存活 M3U 檔名
+OUTPUT_M3U = "Playlist2.m3u"     # 輸出的存活 M3U 檔名 (建議設為 Playlist.m3u 配合 actions)
 MAX_WORKERS = 8                 # 併發執行緒數 (GitHub Actions 建議 8-10)
 TIMEOUT = 8                     # 連線超時時間 (秒)
 
@@ -35,9 +36,14 @@ def parse_m3u_text(text, default_group):
     
     current_title = "未知頻道"
     current_group = default_group if default_group else "Default"
+    current_logo = ""
     
     for line in lines:
         if line.startswith("#EXTINF:"):
+            # 抓取 tvg-logo
+            logo_match = re.search(r'tvg-logo="([^"]*)"', line)
+            current_logo = logo_match.group(1) if logo_match else ""
+
             if "group-title=" in line:
                 try:
                     start = line.index('group-title="') + 13
@@ -55,15 +61,18 @@ def parse_m3u_text(text, default_group):
             channels.append({
                 "title": current_title,
                 "url": line,
-                "group": final_group
+                "group": final_group,
+                "logo": current_logo
             })
             current_title = "未知頻道"
+            current_logo = ""
         elif "," in line and "://" in line: # 支援 TXT 格式
             parts = line.split(",", 1)
             channels.append({
                 "title": parts[0].strip(),
                 "url": parts[1].strip(),
-                "group": default_group if default_group else "Default"
+                "group": default_group if default_group else "Default",
+                "logo": ""
             })
 
     return channels
@@ -75,10 +84,8 @@ def check_channel_deep(ch):
     """
     url = ch["url"]
     try:
-        # 使用 stream=True 進行串流讀取，並允許重定向
         with requests.get(url, headers=HEADERS, timeout=TIMEOUT, stream=True, allow_redirects=True) as response:
             if response.status_code in [200, 206]:
-                # 試圖讀取前 1024 位元組 (1KB) 的實際影音數據
                 for chunk in response.iter_content(chunk_size=1024):
                     if chunk: # 只要能成功接收到第一塊數據封包，即代表是真的活源！
                         print(f"[OK - 串流正常] [{ch['group']}] {ch['title']}")
@@ -132,7 +139,8 @@ def main():
     with open(OUTPUT_M3U, "w", encoding="utf-8") as f:
         f.write("#EXTM3U\n")
         for ch in alive_channels:
-            f.write(f'#EXTINF:-1 group-title="{ch["group"]}",{ch["title"]}\n{ch["url"]}\n')
+            logo_attr = f' tvg-logo="{ch["logo"]}"' if ch.get("logo") else ""
+            f.write(f'#EXTINF:-1 group-title="{ch["group"]}"{logo_attr},{ch["title"]}\n{ch["url"]}\n')
 
     print("完成！")
 
