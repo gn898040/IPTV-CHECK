@@ -24,12 +24,12 @@ jobs:
           pip install requests
 
       - name: Run IPTV Checker
-        run: python checker2.py
+        run: python checker.py
 
       - name: Commit & Push changes
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add Playlist2.m3u
-          git commit -m "Auto update Playlist2.m3u" || exit 0
+          git add Playlist.m3u
+          git commit -m "Auto update Playlist.m3u" || exit 0
           git push
