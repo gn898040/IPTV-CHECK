@@ -6,13 +6,13 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 # 這裡改用字典清單，你可以為每一組指定專屬的分類名稱 (group_title)
 # 如果不想指定分類（維持原本來源的分類），可以填 None
 M3U_SOURCES = [
-#    {
-#        "url": "https://raw.githubusercontent.com/CCSH/IPTV/refs/heads/main/live.m3u",
-#        "group": None  # 使用來源原本的分類
-#    },
+    {
+        "url": "https://raw.githubusercontent.com/CCSH/IPTV/refs/heads/main/live.m3u",
+        "group": None  # 使用來源原本的分類
+    },
     {
         "url": "https://iptv-org.github.io/iptv/countries/tw.m3u",
-        "group": None  # 使用來源原本的分類
+        "group": TW  # 使用來源原本的分類
     },
     {
         "url": "https://gist.githubusercontent.com/tony881025/4ed30002f87b9e4231f47a0a6334d110/raw/4ef0d06fdd1f10411b700957aed714ee94318919/gistfile1.txt",
