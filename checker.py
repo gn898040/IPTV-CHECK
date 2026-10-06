@@ -2,7 +2,6 @@ import os
 import re
 import requests
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from collections import defaultdict
 from opencc import OpenCC
 
 # 初始化 OpenCC 轉換器 (s2twp: 簡體轉繁體台灣正體用語)
@@ -34,16 +33,16 @@ HEADERS = {
 }
 
 def clean_channel_title(title):
-    """ 清理頻道名稱（移除多餘畫質標記，並轉成繁體中文） """
+    """ 清理頻道名稱（轉換繁體並移除畫質/雜訊標記，讓名稱完全一致） """
     # 簡轉繁
     title = cc.convert(title)
-    # 移除畫質與雜訊標記
+    # 移除畫質與雜訊標記，讓 Televizo 容易識別同名頻道
     title = re.sub(r'\[.*?\]|\(.*?\)', '', title)
     title = re.sub(r'(HD|SD|FHD|4K|1080p|720p|480p)', '', title, flags=re.IGNORECASE)
     return title.strip()
 
 def parse_m3u_text(text, default_group):
-    """ 解析 M3U 或 TXT 內容，並將文字統一轉為繁體中文 """
+    """ 解析 M3U 或 TXT 內容，將文字統一轉為繁體中文 """
     channels = []
     lines = [line.strip() for line in text.splitlines() if line.strip()]
     
@@ -68,10 +67,10 @@ def parse_m3u_text(text, default_group):
             elif default_group:
                 current_group = cc.convert(default_group)
 
-            # 3. 抓取頻道名稱 (轉為繁體)
+            # 3. 抓取頻道名稱 (清理並轉為繁體)
             parts = line.split(",", 1)
             if len(parts) > 1:
-                current_title = cc.convert(parts[1].strip())
+                current_title = clean_channel_title(parts[1].strip())
 
         elif line.startswith("#genre#"):
             pass
@@ -80,7 +79,6 @@ def parse_m3u_text(text, default_group):
             final_group = cc.convert(default_group) if default_group else current_group
             channels.append({
                 "title": current_title,
-                "clean_title": clean_channel_title(current_title),
                 "url": line,
                 "group": final_group,
                 "logo": current_logo
@@ -90,10 +88,9 @@ def parse_m3u_text(text, default_group):
 
         elif "," in line and "://" in line: # TXT 格式 (頻道名,網址)
             parts = line.split(",", 1)
-            raw_title = cc.convert(parts[0].strip())
+            raw_title = clean_channel_title(parts[0].strip())
             channels.append({
                 "title": raw_title,
-                "clean_title": clean_channel_title(raw_title),
                 "url": parts[1].strip(),
                 "group": cc.convert(default_group) if default_group else "Default",
                 "logo": ""
@@ -156,20 +153,13 @@ def main():
 
     print(f"\n3. 檢測完成！真存活數量: {len(alive_channels)} / {len(unique_channels)}")
 
-    # 相同頻道歸類整合
-    grouped_channels = defaultdict(list)
-    for ch in alive_channels:
-        key = (ch["group"], ch["clean_title"])
-        grouped_channels[key].append(ch)
-
-    print(f"4. 寫入繁體化與整合後的 {OUTPUT_M3U}...")
+    print(f"4. 寫入不帶線路後綴的 {OUTPUT_M3U}...")
     with open(OUTPUT_M3U, "w", encoding="utf-8") as f:
         f.write("#EXTM3U\n")
-        for (group, title), ch_list in grouped_channels.items():
-            for idx, ch in enumerate(ch_list):
-                display_title = title if len(ch_list) == 1 else f"{title} (線路{idx+1})"
-                logo_attr = f' tvg-logo="{ch["logo"]}"' if ch.get("logo") else ""
-                f.write(f'#EXTINF:-1 group-title="{group}" tvg-name="{title}"{logo_attr},{display_title}\n{ch["url"]}\n')
+        for ch in alive_channels:
+            logo_attr = f' tvg-logo="{ch["logo"]}"' if ch.get("logo") else ""
+            # 直接寫入標準頻道名稱，完全不加 (線路1)、(線路2)，讓播放器自動合併
+            f.write(f'#EXTINF:-1 group-title="{ch["group"]}" tvg-name="{ch["title"]}"{logo_attr},{ch["title"]}\n{ch["url"]}\n')
 
     print("完成！")
 
