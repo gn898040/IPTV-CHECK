@@ -107,13 +107,12 @@ def main():
         except Exception as e:
             print(f"下載發生錯誤: {e}")
 
-    # 針對 URL 去重
+# 針對 URL 去重
     seen_urls = set()
     unique_channels = []
     for ch in all_channels:
         if ch["url"] not in seen_urls:
             seen_urls.add(ch["url"])
-            seen_urls.add(ch)
             unique_channels.append(ch)
 
     print(f"\n2. 合計不重複頻道 {len(unique_channels)} 個，開始多執行緒連通性檢測...")
