@@ -12,7 +12,7 @@ M3U_SOURCES = [
     },
     {
         "url": "https://iptv-org.github.io/iptv/countries/tw.m3u",
-        "group": TW  # 使用來源原本的分類
+        "group": "TW"  # 使用來源原本的分類
     },
     {
         "url": "https://gist.githubusercontent.com/tony881025/4ed30002f87b9e4231f47a0a6334d110/raw/4ef0d06fdd1f10411b700957aed714ee94318919/gistfile1.txt",
