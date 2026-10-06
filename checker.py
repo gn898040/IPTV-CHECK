@@ -3,12 +3,16 @@ import re
 import requests
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from collections import defaultdict
+from opencc import OpenCC
+
+# 初始化 OpenCC 轉換器 (s2twp: 簡體轉繁體台灣正體用語)
+cc = OpenCC('s2twp')
 
 # --- 設定區 ---
 M3U_SOURCES = [
     {
         "url": "https://raw.githubusercontent.com/CCSH/IPTV/refs/heads/main/live.m3u",
-        "group": None  # 保留原分類
+        "group": None  # 保留原分類 (會自動轉繁體)
     },
     {
         "url": "https://iptv-org.github.io/iptv/countries/tw.m3u",
@@ -24,48 +28,56 @@ OUTPUT_M3U = "Playlist.m3u"     # 輸出的存活 M3U 檔名
 MAX_WORKERS = 8                 # 併發執行緒數
 TIMEOUT = 8                     # 連線超時時間 (秒)
 
-# 模擬 VLC 播放器 Header
 HEADERS = {
     "User-Agent": "VLC/3.0.9 LibVLC/3.0.9",
     "Accept": "*/*"
 }
 
 def clean_channel_title(title):
-    """ 清理頻道名稱（移除多餘的畫質標記，方便同名頻道歸併） """
-    # 移除如 [720p], (1080p), [HD], - 備用 等字樣，使頻道名統一
+    """ 清理頻道名稱（移除多餘畫質標記，並轉成繁體中文） """
+    # 簡轉繁
+    title = cc.convert(title)
+    # 移除畫質與雜訊標記
     title = re.sub(r'\[.*?\]|\(.*?\)', '', title)
     title = re.sub(r'(HD|SD|FHD|4K|1080p|720p|480p)', '', title, flags=re.IGNORECASE)
     return title.strip()
 
 def parse_m3u_text(text, default_group):
-    """ 解析 M3U 或 TXT 內容 """
+    """ 解析 M3U 或 TXT 內容，並將文字統一轉為繁體中文 """
     channels = []
     lines = [line.strip() for line in text.splitlines() if line.strip()]
     
     current_title = "未知頻道"
-    current_group = default_group if default_group else "Default"
+    current_group = cc.convert(default_group) if default_group else "Default"
     current_logo = ""
     
     for line in lines:
         if line.startswith("#EXTINF:"):
-            # 抓取 tvg-logo
+            # 1. 抓取 tvg-logo
             logo_match = re.search(r'tvg-logo="([^"]*)"', line)
             current_logo = logo_match.group(1) if logo_match else ""
 
-            if "group-title=" in line:
+            # 2. 抓取 group-title (轉為繁體)
+            if not default_group and 'group-title="' in line:
                 try:
                     start = line.index('group-title="') + 13
                     end = line.index('"', start)
-                    current_group = line[start:end]
+                    current_group = cc.convert(line[start:end])
                 except:
                     pass
+            elif default_group:
+                current_group = cc.convert(default_group)
+
+            # 3. 抓取頻道名稱 (轉為繁體)
             parts = line.split(",", 1)
             if len(parts) > 1:
-                current_title = parts[1].strip()
+                current_title = cc.convert(parts[1].strip())
+
         elif line.startswith("#genre#"):
             pass
+
         elif line.startswith("http://") or line.startswith("https://"):
-            final_group = default_group if default_group else current_group
+            final_group = cc.convert(default_group) if default_group else current_group
             channels.append({
                 "title": current_title,
                 "clean_title": clean_channel_title(current_title),
@@ -75,14 +87,15 @@ def parse_m3u_text(text, default_group):
             })
             current_title = "未知頻道"
             current_logo = ""
-        elif "," in line and "://" in line: # TXT 格式
+
+        elif "," in line and "://" in line: # TXT 格式 (頻道名,網址)
             parts = line.split(",", 1)
-            raw_title = parts[0].strip()
+            raw_title = cc.convert(parts[0].strip())
             channels.append({
                 "title": raw_title,
                 "clean_title": clean_channel_title(raw_title),
                 "url": parts[1].strip(),
-                "group": default_group if default_group else "Default",
+                "group": cc.convert(default_group) if default_group else "Default",
                 "logo": ""
             })
 
@@ -143,19 +156,17 @@ def main():
 
     print(f"\n3. 檢測完成！真存活數量: {len(alive_channels)} / {len(unique_channels)}")
 
-    # --- 核心改進：相同頻道整合與線路編號 ---
-    # 將同分類且同名稱（或清理後名稱相似）的頻道歸類在一起
+    # 相同頻道歸類整合
     grouped_channels = defaultdict(list)
     for ch in alive_channels:
         key = (ch["group"], ch["clean_title"])
         grouped_channels[key].append(ch)
 
-    print(f"4. 寫入整合後的 {OUTPUT_M3U}...")
+    print(f"4. 寫入繁體化與整合後的 {OUTPUT_M3U}...")
     with open(OUTPUT_M3U, "w", encoding="utf-8") as f:
         f.write("#EXTM3U\n")
         for (group, title), ch_list in grouped_channels.items():
             for idx, ch in enumerate(ch_list):
-                # 如果同一個頻道有多條存活線路，自動標註 (線路1), (線路2)
                 display_title = title if len(ch_list) == 1 else f"{title} (線路{idx+1})"
                 logo_attr = f' tvg-logo="{ch["logo"]}"' if ch.get("logo") else ""
                 f.write(f'#EXTINF:-1 group-title="{group}" tvg-name="{title}"{logo_attr},{display_title}\n{ch["url"]}\n')
