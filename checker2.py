@@ -6,14 +6,14 @@ from collections import defaultdict
 
 # --- 設定區 ---
 M3U_SOURCES = [
-    {
-        "url": "https://raw.githubusercontent.com/CCSH/IPTV/refs/heads/main/live.m3u",
-        "group": None  # 保留原分類
-    },
-    {
-        "url": "https://iptv-org.github.io/iptv/countries/tw.m3u",
-        "group": "TW"  # 強制分類為 TW
-    },
+#    {
+#        "url": "https://raw.githubusercontent.com/CCSH/IPTV/refs/heads/main/live.m3u",
+#        "group": None  # 保留原分類
+#    },
+#    {
+#        "url": "https://iptv-org.github.io/iptv/countries/tw.m3u",
+#        "group": "TW"  # 強制分類為 TW
+#    },
     {
         "url": "https://gist.githubusercontent.com/tony881025/4ed30002f87b9e4231f47a0a6334d110/raw/4ef0d06fdd1f10411b700957aed714ee94318919/gistfile1.txt",
         "group": "X頻道"  # 強制分類為 X頻道
