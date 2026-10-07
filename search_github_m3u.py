@@ -5,10 +5,9 @@ import time
 from datetime import datetime, timedelta, timezone
 
 # --- 設定區 ---
-MAX_DAYS_OLD = 60
+MAX_DAYS_OLD = 30
 OUTPUT_M3U = "Github_Collected.m3u"
 
-# 廣義關鍵字
 SEARCH_QUERIES = [
     "filename:playlist.m3u",
     "filename:playlist.txt",
@@ -17,7 +16,6 @@ SEARCH_QUERIES = [
     "extm3u IPTV"
 ]
 
-# 僅排除「網路遊戲/娛樂直播平台」（不影響傳統電視台）
 EXCLUDE_STREAM_PLATFORMS = [
     "鬥魚", "斗鱼", "douyu",
     "虎牙", "huya",
@@ -28,18 +26,17 @@ EXCLUDE_STREAM_PLATFORMS = [
     "twitch", "章魚直播", "企鵝電競", "花椒直播", "映客", "網易CC"
 ]
 
-GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", "") 
+GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", "").strip()
 
 HEADERS = {
-    "User-Agent": "VLC/3.0.9 LibVLC/3.0.9",
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
     "Accept": "application/vnd.github.v3+json"
 }
 
 if GITHUB_TOKEN:
-    HEADERS["Authorization"] = f"token {GITHUB_TOKEN}"
+    HEADERS["Authorization"] = f"Bearer {GITHUB_TOKEN}"
 
 def clean_title(title):
-    """ 清理頻道名稱雜訊，確保同名頻道能合併 """
     original = title
     title = re.sub(r'\[.*?\]|\(.*?\)', '', title)
     title = re.sub(r'(HD|SD|FHD|4K|1080p|720p|480p)', '', title, flags=re.IGNORECASE)
@@ -47,7 +44,6 @@ def clean_title(title):
     return title if title else original
 
 def is_stream_platform(title, url):
-    """ 僅過濾鬥魚/虎牙等網路直播平台 """
     check_text = f"{title} {url}".lower()
     for kw in EXCLUDE_STREAM_PLATFORMS:
         if kw in check_text:
@@ -55,7 +51,6 @@ def is_stream_platform(title, url):
     return False
 
 def is_valid_chinese_or_tv_channel(title, full_text):
-    """ 檢查標題是否包含中文、熱門電視台名稱 (CCTV, TVBS 等)，或全文包含中文 """
     if re.search(r'[\u4e00-\u9fa5]', title):
         return True
     if re.search(r'\b(CCTV|TVBS|HBO|CTV|CTS|FTV|TTV|凤凰|衛視)\b', title, re.IGNORECASE):
@@ -64,12 +59,25 @@ def is_valid_chinese_or_tv_channel(title, full_text):
         return True
     return False
 
+def safe_github_request(url):
+    """ 帶有 429 / 403 自動退避等待機制的請求函數 """
+    for attempt in range(3):
+        res = requests.get(url, headers=HEADERS, timeout=10)
+        if res.status_code == 200:
+            return res
+        elif res.status_code in [429, 403]:
+            print(f"  └ 觸發限制 (HTTP {res.status_code})，冷卻 10 秒後重試 (第 {attempt+1} 次)...")
+            time.sleep(10)
+        else:
+            print(f"  └ API 請求失敗，HTTP 狀態碼: {res.status_code}")
+            break
+    return res
+
 def is_file_updated_recently(owner, repo, path):
-    """ 檢查檔案最後 Commit 是否在最近 MAX_DAYS_OLD 天內 """
     url = f"https://api.github.com/repos/{owner}/{repo}/commits?path={path}&page=1&per_page=1"
     try:
-        res = requests.get(url, headers=HEADERS, timeout=8)
-        if res.status_code == 200:
+        res = safe_github_request(url)
+        if res and res.status_code == 200:
             commits = res.json()
             if commits:
                 commit_date_str = commits[0]["commit"]["committer"]["date"]
@@ -88,7 +96,6 @@ def is_file_updated_recently(owner, repo, path):
     return False
 
 def search_github_playlist_files():
-    """ 搜尋並抓取最新收錄的 IPTV 檔案 """
     valid_files = []
     seen_paths = set()
     
@@ -96,12 +103,11 @@ def search_github_playlist_files():
     
     for query in SEARCH_QUERIES:
         print(f"\n[執行搜尋]: {query}")
-        for page in range(1, 4): # 擴大至前 3 頁
-            # 關鍵修正：加入 sort=indexed&order=desc，強制抓取近期更新的檔案
-            url = f"https://api.github.com/search/code?q={query}&sort=indexed&order=desc&per_page=30&page={page}"
+        for page in range(1, 3): # 抓取前 2 頁即可，控制請求量
+            url = f"https://api.github.com/search/code?q={query}&sort=indexed&order=desc&per_page=20&page={page}"
             try:
-                res = requests.get(url, headers=HEADERS, timeout=10)
-                if res.status_code == 200:
+                res = safe_github_request(url)
+                if res and res.status_code == 200:
                     data = res.json()
                     items = data.get("items", [])
                     if not items:
@@ -129,12 +135,8 @@ def search_github_playlist_files():
                                 "raw_url": raw_url,
                                 "path": path
                             })
-                        time.sleep(0.3)
-                elif res.status_code == 403:
-                    print("  └ 觸發 GitHub API Rate Limit，跳過此查詢。")
-                    break
+                        time.sleep(0.8) # 拉長間隔至 0.8 秒，避免觸發 429
                 else:
-                    print(f"  └ API 發生未預期錯誤，代碼: {res.status_code}")
                     break
             except Exception as e:
                 print(f"  └ 搜尋發生錯誤: {e}")
@@ -143,7 +145,6 @@ def search_github_playlist_files():
     return valid_files
 
 def parse_playlist_content(raw_url):
-    """ 解析內容、確保提取中文及 CCTV 頻道，並排除鬥魚/虎牙等直播平台 """
     channels = []
     try:
         res = requests.get(raw_url, headers=HEADERS, timeout=10)
@@ -157,7 +158,6 @@ def parse_playlist_content(raw_url):
             current_raw_title = ""
             
             for line in lines:
-                # M3U 格式
                 if line.startswith("#EXTINF:"):
                     parts = line.split(",", 1)
                     if len(parts) > 1:
@@ -171,7 +171,6 @@ def parse_playlist_content(raw_url):
                                 temp_channels.append((final_title, current_raw_title, line))
                         current_raw_title = ""
 
-                # TXT 格式 (頻道名,網址)
                 elif "," in line and "://" in line and not line.startswith("#"):
                     parts = line.split(",", 1)
                     raw_title = parts[0].strip()
@@ -197,7 +196,6 @@ def parse_playlist_content(raw_url):
 def main():
     found_files = search_github_playlist_files()
     
-    # 字典： {"標準頻道名稱": [ ("原始名稱", "url1"), ("原始名稱", "url2") ]}
     channel_dict = {}
     seen_urls = set()
 
@@ -234,7 +232,6 @@ def main():
 
     with open(OUTPUT_M3U, "w", encoding="utf-8") as f:
         f.write("#EXTM3U\n")
-        # 同名頻道會連續集中寫出
         for clean_t in sorted_titles:
             for raw_t, stream_url in channel_dict[clean_t]:
                 f.write(f'#EXTINF:-1 group-title="GitHub搜集" tvg-name="{clean_t}",{clean_t}\n{stream_url}\n')
