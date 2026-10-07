@@ -11,8 +11,8 @@ OUTPUT_M3U = "Github_Collected.m3u"
 # 自動計算 30 天前的 UTC 日期字串 (YYYY-MM-DD)
 thirty_days_ago = (datetime.now(timezone.utc) - timedelta(days=MAX_DAYS_OLD)).strftime('%Y-%m-%d')
 
-# 搜尋語法：同時搜尋 playlist.m3u 與 playlist.txt，且 repo 近 30 天內有更新
-SEARCH_QUERY = f"(filename:playlist.m3u OR filename:playlist.txt) pushed:>{thirty_days_ago}"
+# 放寬搜尋語法：搜尋包含 m3u 或 txt 關鍵字且 30 天內有 push 的專案
+SEARCH_QUERY = f"(filename:playlist.m3u OR filename:playlist.txt OR filename:live.m3u OR filename:tv.m3u) pushed:>{thirty_days_ago}"
 
 GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", "") 
 
@@ -49,11 +49,11 @@ def is_file_updated_recently(owner, repo, path):
     return False
 
 def search_github_playlist_files():
-    """ 搜尋近一個月有更新的 playlist.m3u 與 playlist.txt """
+    """ 搜尋近一個月有更新的 IPTV 清單檔案 """
     url = f"https://api.github.com/search/code?q={SEARCH_QUERY}&per_page=30"
     valid_files = []
     
-    print(f"1. 正在搜尋 GitHub 上最近 {MAX_DAYS_OLD} 天內 (pushed:>{thirty_days_ago}) 的 playlist.m3u 及 playlist.txt...")
+    print(f"1. 正在搜尋 GitHub 上最近 {MAX_DAYS_OLD} 天內 (pushed:>{thirty_days_ago}) 的 IPTV 清單...")
     try:
         res = requests.get(url, headers=HEADERS, timeout=10)
         if res.status_code == 200:
@@ -81,7 +81,7 @@ def search_github_playlist_files():
                     })
                 time.sleep(0.5)
         elif res.status_code == 403:
-            print("觸發 GitHub API 速率限制！建議在環境變數中設定 GITHUB_TOKEN。")
+            print("觸發 GitHub API 速率限制！請確認已帶入 GITHUB_TOKEN。")
         else:
             print(f"API 請求失敗，狀態碼: {res.status_code}")
     except Exception as e:
@@ -121,7 +121,7 @@ def parse_playlist_content(raw_url):
                         current_inf = ""
                         current_title = ""
 
-                # TXT 格式解析
+                # TXT 格式解析 (例如: TVBS新聞台,http://...)
                 elif "," in line and "://" in line and not line.startswith("#"):
                     parts = line.split(",", 1)
                     title = parts[0].strip()
@@ -147,38 +147,39 @@ def parse_playlist_content(raw_url):
 
 def main():
     found_files = search_github_playlist_files()
-    if not found_files:
-        print("\n未搜尋到符合條件的檔案，結束程式。")
-        return
-
+    
     all_channels = []
     seen_urls = set()
 
-    print(f"\n2. 開始下載並驗證內容 ({len(found_files)} 個檔案)...")
-    for item in found_files:
-        repo = item["repo"]
-        raw_url = item["raw_url"]
-        path = item["path"]
-        print(f"\n正在讀取 [{repo}] -> {path}...")
-        
-        channels = parse_playlist_content(raw_url)
-        new_count = 0
-        for inf, stream_url in channels:
-            if stream_url not in seen_urls:
-                seen_urls.add(stream_url)
-                all_channels.append((inf, stream_url))
-                new_count += 1
-                
-        if channels:
-            print(f"  └ 成功提取 {new_count} 個新頻道")
+    if found_files:
+        print(f"\n2. 開始下載並驗證內容 ({len(found_files)} 個檔案)...")
+        for item in found_files:
+            repo = item["repo"]
+            raw_url = item["raw_url"]
+            path = item["path"]
+            print(f"\n正在讀取 [{repo}] -> {path}...")
+            
+            channels = parse_playlist_content(raw_url)
+            new_count = 0
+            for inf, stream_url in channels:
+                if stream_url not in seen_urls:
+                    seen_urls.add(stream_url)
+                    all_channels.append((inf, stream_url))
+                    new_count += 1
+                    
+            if channels:
+                print(f"  └ 成功提取 {new_count} 個新頻道")
+    else:
+        print("\n未搜尋到符合條件的檔案。")
 
+    # 關鍵防呆：無論是否找到頻道，強制建立/更新檔案，避免 Actions 找不到檔案報錯
     print(f"\n3. 寫入搜集成果至 {OUTPUT_M3U} (共 {len(all_channels)} 個不重複頻道)...")
     with open(OUTPUT_M3U, "w", encoding="utf-8") as f:
         f.write("#EXTM3U\n")
         for inf, stream_url in all_channels:
             f.write(f"{inf}\n{stream_url}\n")
 
-    print("完成！")
+    print("搜集完成！")
 
 if __name__ == "__main__":
     main()
