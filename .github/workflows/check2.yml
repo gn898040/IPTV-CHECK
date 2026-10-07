@@ -1,8 +1,8 @@
 name: IPTV Check
 
 on:
-#  schedule:
-#    - cron: '0 0 * * *'  # 每天自動執行
+  schedule:
+    - cron: '0 0 * * *'  # 每天自動執行
   workflow_dispatch:      # 允許手動觸發
 
 jobs:
@@ -21,7 +21,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install requests
+          pip install requests opencc-python-reimplemented
 
       - name: Run IPTV Checker
         run: python checker2.py
