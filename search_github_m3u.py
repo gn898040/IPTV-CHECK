@@ -8,16 +8,13 @@ from datetime import datetime, timedelta, timezone
 MAX_DAYS_OLD = 30
 OUTPUT_M3U = "Github_Collected.m3u"
 
-# 30 天前的時間基準字串 (YYYY-MM-DD)
-thirty_days_ago_str = (datetime.now(timezone.utc) - timedelta(days=MAX_DAYS_OLD)).strftime('%Y-%m-%d')
-
-# 多組涵蓋廣泛的搜尋語法 (含時間過濾)
+# 廣義關鍵字 (完全不加 pushed API 限制，避免被 GitHub 封鎖搜尋結果)
 SEARCH_QUERIES = [
-    f"filename:playlist.m3u pushed:>{thirty_days_ago_str}",
-    f"filename:playlist.txt pushed:>{thirty_days_ago_str}",
-    f"filename:live.m3u pushed:>{thirty_days_ago_str}",
-    f"filename:tv.m3u pushed:>{thirty_days_ago_str}",
-    f"extm3u pushed:>{thirty_days_ago_str}"
+    "filename:playlist.m3u",
+    "filename:playlist.txt",
+    "filename:live.m3u",
+    "filename:tv.m3u",
+    "extm3u IPTV"
 ]
 
 GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", "") 
@@ -30,17 +27,40 @@ HEADERS = {
 if GITHUB_TOKEN:
     HEADERS["Authorization"] = f"token {GITHUB_TOKEN}"
 
+def is_file_updated_recently(owner, repo, path):
+    """ 用 Python 精準檢查檔案最後 Commit 是否在最近 MAX_DAYS_OLD 天內 """
+    url = f"https://api.github.com/repos/{owner}/{repo}/commits?path={path}&page=1&per_page=1"
+    try:
+        res = requests.get(url, headers=HEADERS, timeout=8)
+        if res.status_code == 200:
+            commits = res.json()
+            if commits:
+                commit_date_str = commits[0]["commit"]["committer"]["date"]
+                commit_date = datetime.strptime(commit_date_str, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
+                
+                days_diff = (datetime.now(timezone.utc) - commit_date).days
+                if days_diff <= MAX_DAYS_OLD:
+                    print(f"  └ [時間符合] 檔案更新於 {days_diff} 天前 ({commit_date_str[:10]})")
+                    return True
+                else:
+                    print(f"  └ [時間跳過] 檔案更新於 {days_diff} 天前 (超過 {MAX_DAYS_OLD} 天)")
+                    return False
+    except Exception as e:
+        print(f"  └ 無法取得時間 ({e})，預設放行檢測。")
+        return True
+    return False
+
 def search_github_playlist_files():
-    """ 輪詢搜尋條件並進行多頁翻頁 (Pagination)，大幅增加搜尋量 """
+    """ 搜尋專案並透過 Python 進行雙重篩選 """
     valid_files = []
     seen_paths = set()
     
-    print(f"1. 開始從 GitHub 搜尋近 {MAX_DAYS_OLD} 天內 (pushed:>{thirty_days_ago_str}) 的 IPTV 清單...")
+    print(f"1. 開始從 GitHub 搜尋熱門 IPTV 清單...")
     
     for query in SEARCH_QUERIES:
-        print(f"\n[搜尋關鍵字]: {query}")
-        # 翻頁：抓取第 1 到第 3 頁，每頁 30 筆，總共可搜尋近百個專案
-        for page in range(1, 4):
+        print(f"\n[執行搜尋]: {query}")
+        # 翻頁搜尋第 1~2 頁
+        for page in range(1, 3):
             url = f"https://api.github.com/search/code?q={query}&per_page=30&page={page}"
             try:
                 res = requests.get(url, headers=HEADERS, timeout=10)
@@ -48,9 +68,9 @@ def search_github_playlist_files():
                     data = res.json()
                     items = data.get("items", [])
                     if not items:
-                        break  # 後續沒頁數了，換下一個關鍵字
+                        break
                         
-                    print(f"  └ 第 {page} 頁找到 {len(items)} 個潛在檔案")
+                    print(f"  └ 第 {page} 頁找到 {len(items)} 個檔案，開始驗證更新時間...")
                     
                     for item in items:
                         repo_full_name = item.get("repository", {}).get("full_name", "")
@@ -61,17 +81,20 @@ def search_github_playlist_files():
                             continue
                         
                         seen_paths.add(unique_key)
-                        html_url = item.get("html_url", "")
-                        raw_url = html_url.replace("github.com", "raw.githubusercontent.com").replace("/blob/", "/")
+                        owner, repo_name = repo_full_name.split("/")
                         
-                        valid_files.append({
-                            "repo": repo_full_name,
-                            "raw_url": raw_url,
-                            "path": path
-                        })
-                    time.sleep(0.5)
+                        print(f"檢查: [{repo_full_name}] -> {path}")
+                        if is_file_updated_recently(owner, repo_name, path):
+                            html_url = item.get("html_url", "")
+                            raw_url = html_url.replace("github.com", "raw.githubusercontent.com").replace("/blob/", "/")
+                            valid_files.append({
+                                "repo": repo_full_name,
+                                "raw_url": raw_url,
+                                "path": path
+                            })
+                        time.sleep(0.3) # 短暫停頓避免 Rate Limit
                 elif res.status_code == 403:
-                    print("  └ 觸發 GitHub API 速率限制，停止當前查詢。")
+                    print("  └ 觸發 GitHub API Rate Limit，跳過此查詢。")
                     break
                 else:
                     break
@@ -82,7 +105,7 @@ def search_github_playlist_files():
     return valid_files
 
 def parse_playlist_content(raw_url):
-    """ 解析 M3U / TXT 內容並檢查頻道標題是否含有中文字 """
+    """ 解析內容並檢查頻道標題是否含有中文字 """
     channels = []
     try:
         res = requests.get(raw_url, headers=HEADERS, timeout=10)
@@ -113,7 +136,7 @@ def parse_playlist_content(raw_url):
                         current_inf = ""
                         current_title = ""
 
-                # TXT 格式 (例如: TVBS新聞台,http://...)
+                # TXT 格式 (頻道名,網址)
                 elif "," in line and "://" in line and not line.startswith("#"):
                     parts = line.split(",", 1)
                     title = parts[0].strip()
@@ -126,10 +149,10 @@ def parse_playlist_content(raw_url):
                     temp_channels.append((title, extinf, url))
 
             if has_chinese_title:
-                print(f"  └ [符合中文] 成功提取 {len(temp_channels)} 個頻道！")
+                print(f"  └ [含有中文] 成功提取 {len(temp_channels)} 個頻道！")
                 return [(inf, url) for title, inf, url in temp_channels]
             else:
-                print(f"  └ [跳過中文] 檔案內頻道名稱均無中文標題。")
+                print(f"  └ [無中文] 跳過此檔案。")
                 return []
                 
     except Exception as e:
@@ -144,7 +167,7 @@ def main():
     seen_urls = set()
 
     if found_files:
-        print(f"\n2. 開始下載並驗證內容 (共找到 {len(found_files)} 個候選檔案)...")
+        print(f"\n2. 開始下載並驗證內容 (共 {len(found_files)} 個符合 30 天條件的檔案)...")
         for item in found_files:
             repo = item["repo"]
             raw_url = item["raw_url"]
