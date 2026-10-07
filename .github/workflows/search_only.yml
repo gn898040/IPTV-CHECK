@@ -34,6 +34,6 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add Github_Collected.m3u
+          git add Github_Collected.m3u || true
           git commit -m "Auto collect Github_Collected.m3u" || exit 0
           git push
