@@ -1,0 +1,36 @@
+name: Scan Xtream IPTV
+
+on:
+  workflow_dispatch:      # 僅保留手動點擊按鈕觸發
+
+permissions:
+  contents: write         # 賦予推送檔案回 Repo 的寫入權限
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests opencc-python-reimplemented
+
+      - name: Run Xtream Scanner
+        run: python scan_xtream.py
+
+      - name: Commit & Push changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add Xtream_Scan.m3u
+          git commit -m "Manual update Xtream_Scan.m3u" || exit 0
+          git push
