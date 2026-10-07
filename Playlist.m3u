@@ -3585,6 +3585,8 @@ http://cm61-10-2-143.hkcable.com.hk/live_freedirect/freehd209_h.live/playlist.m3
 https://epg.pw/stream/850967cb490cf3c98e20a19b56de0e5a029710949cff71a4132bf059dcf656bc.m3u8
 #EXTINF:-1 group-title="TW2頻道" tvg-name="中視",中視
 http://37.27.111.214:8080/live/7/hls.m3u8
+#EXTINF:-1 group-title="X頻道" tvg-name="奧視",奧視
+http://15.204.105.50:25461/live/G2s9zK2n9m/xDtwVfWM8T/85.ts
 #EXTINF:-1 group-title="X頻道" tvg-name="潘朵拉",潘朵拉
 http://15.204.105.50:25461/live/G2s9zK2n9m/xDtwVfWM8T/86.ts
 #EXTINF:-1 group-title="X頻道" tvg-name="松視1臺",松視1臺
