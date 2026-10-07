@@ -24,7 +24,9 @@ jobs:
           pip install requests opencc-python-reimplemented
 
       - name: Run IPTV Checker
-        run: python checker2.py
+        env:
+          PYTHONUNBUFFERED: "1"   # 關鍵：強制 Python 即時輸出 Log，不卡畫面！
+        run: python -u checker2.py
 
       - name: Commit & Push changes
         run: |
