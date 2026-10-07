@@ -8,15 +8,16 @@ from datetime import datetime, timedelta, timezone
 MAX_DAYS_OLD = 30
 OUTPUT_M3U = "Github_Collected.m3u"
 
-# 30 天前的時間基準
-thirty_days_ago_dt = datetime.now(timezone.utc) - timedelta(days=MAX_DAYS_OLD)
+# 30 天前的時間基準字串 (YYYY-MM-DD)
+thirty_days_ago_str = (datetime.now(timezone.utc) - timedelta(days=MAX_DAYS_OLD)).strftime('%Y-%m-%d')
 
-# 精準且涵蓋廣的 GitHub 搜尋關鍵字 (搜尋包含 #EXTINF 的 M3U/TXT 檔案)
+# 多組涵蓋廣泛的搜尋語法 (含時間過濾)
 SEARCH_QUERIES = [
-    "extm3u filename:playlist.m3u",
-    "extm3u filename:playlist.txt",
-    "extm3u filename:live.m3u",
-    "extm3u filename:tv.m3u"
+    f"filename:playlist.m3u pushed:>{thirty_days_ago_str}",
+    f"filename:playlist.txt pushed:>{thirty_days_ago_str}",
+    f"filename:live.m3u pushed:>{thirty_days_ago_str}",
+    f"filename:tv.m3u pushed:>{thirty_days_ago_str}",
+    f"extm3u pushed:>{thirty_days_ago_str}"
 ]
 
 GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", "") 
@@ -29,72 +30,55 @@ HEADERS = {
 if GITHUB_TOKEN:
     HEADERS["Authorization"] = f"token {GITHUB_TOKEN}"
 
-def is_file_updated_recently(owner, repo, path):
-    """ 檢查檔案最後 Commit 是否在最近 MAX_DAYS_OLD 天內 """
-    url = f"https://api.github.com/repos/{owner}/{repo}/commits?path={path}&page=1&per_page=1"
-    try:
-        res = requests.get(url, headers=HEADERS, timeout=8)
-        if res.status_code == 200:
-            commits = res.json()
-            if commits:
-                commit_date_str = commits[0]["commit"]["committer"]["date"]
-                commit_date = datetime.strptime(commit_date_str, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
-                
-                days_diff = (datetime.now(timezone.utc) - commit_date).days
-                if days_diff <= MAX_DAYS_OLD:
-                    print(f"  └ [符合時間] 檔案更新於 {days_diff} 天前 ({commit_date_str[:10]})")
-                    return True
-                else:
-                    print(f"  └ [跳過時間] 最後更新於 {days_diff} 天前 (超過 {MAX_DAYS_OLD} 天)")
-                    return False
-    except Exception as e:
-        # 若無法取得 commit 時間，原則上允許下載檢測內容
-        print(f"  └ 無法取得 Commit 時間，預設放行檢測。")
-        return True
-    return False
-
 def search_github_playlist_files():
-    """ 輪詢搜尋條件，搜集潛在 IPTV 清單 """
+    """ 輪詢搜尋條件並進行多頁翻頁 (Pagination)，大幅增加搜尋量 """
     valid_files = []
     seen_paths = set()
     
-    print(f"1. 開始從 GitHub 搜尋熱門 IPTV 清單...")
+    print(f"1. 開始從 GitHub 搜尋近 {MAX_DAYS_OLD} 天內 (pushed:>{thirty_days_ago_str}) 的 IPTV 清單...")
+    
     for query in SEARCH_QUERIES:
-        url = f"https://api.github.com/search/code?q={query}&per_page=15"
-        try:
-            res = requests.get(url, headers=HEADERS, timeout=10)
-            if res.status_code == 200:
-                data = res.json()
-                items = data.get("items", [])
-                print(f"  └ 查詢 '{query}' 找到 {len(items)} 個結果")
-                
-                for item in items:
-                    repo_full_name = item.get("repository", {}).get("full_name", "")
-                    path = item.get("path", "")
-                    unique_key = f"{repo_full_name}/{path}"
+        print(f"\n[搜尋關鍵字]: {query}")
+        # 翻頁：抓取第 1 到第 3 頁，每頁 30 筆，總共可搜尋近百個專案
+        for page in range(1, 4):
+            url = f"https://api.github.com/search/code?q={query}&per_page=30&page={page}"
+            try:
+                res = requests.get(url, headers=HEADERS, timeout=10)
+                if res.status_code == 200:
+                    data = res.json()
+                    items = data.get("items", [])
+                    if not items:
+                        break  # 後續沒頁數了，換下一個關鍵字
+                        
+                    print(f"  └ 第 {page} 頁找到 {len(items)} 個潛在檔案")
                     
-                    if not repo_full_name or not path or unique_key in seen_paths:
-                        continue
-                    
-                    seen_paths.add(unique_key)
-                    owner, repo_name = repo_full_name.split("/")
-                    
-                    print(f"\n檢查專案: [{repo_full_name}] 檔案: {path}")
-                    if is_file_updated_recently(owner, repo_name, path):
+                    for item in items:
+                        repo_full_name = item.get("repository", {}).get("full_name", "")
+                        path = item.get("path", "")
+                        unique_key = f"{repo_full_name}/{path}"
+                        
+                        if not repo_full_name or not path or unique_key in seen_paths:
+                            continue
+                        
+                        seen_paths.add(unique_key)
                         html_url = item.get("html_url", "")
                         raw_url = html_url.replace("github.com", "raw.githubusercontent.com").replace("/blob/", "/")
+                        
                         valid_files.append({
                             "repo": repo_full_name,
                             "raw_url": raw_url,
                             "path": path
                         })
                     time.sleep(0.5)
-            elif res.status_code == 403:
-                print("  └ 觸發 GitHub API 速率限制，停止後續搜尋。")
+                elif res.status_code == 403:
+                    print("  └ 觸發 GitHub API 速率限制，停止當前查詢。")
+                    break
+                else:
+                    break
+            except Exception as e:
+                print(f"  └ 搜尋發生錯誤: {e}")
                 break
-        except Exception as e:
-            print(f"搜尋 '{query}' 發生錯誤: {e}")
-            
+                
     return valid_files
 
 def parse_playlist_content(raw_url):
@@ -160,7 +144,7 @@ def main():
     seen_urls = set()
 
     if found_files:
-        print(f"\n2. 開始下載並驗證內容 ({len(found_files)} 個檔案)...")
+        print(f"\n2. 開始下載並驗證內容 (共找到 {len(found_files)} 個候選檔案)...")
         for item in found_files:
             repo = item["repo"]
             raw_url = item["raw_url"]
