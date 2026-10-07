@@ -5,7 +5,7 @@ import time
 from datetime import datetime, timedelta, timezone
 
 # --- 設定區 ---
-MAX_DAYS_OLD = 60
+MAX_DAYS_OLD = 30
 OUTPUT_M3U = "Github_Collected.m3u"
 
 # 廣義關鍵字
@@ -44,12 +44,13 @@ if GITHUB_TOKEN:
     HEADERS["Authorization"] = f"token {GITHUB_TOKEN}"
 
 def clean_title(title):
-    """ 清理頻道名稱雜訊，確保同名頻道能完美歸類 """
+    """ 安全地清理頻道名稱雜訊，若清洗後變空白則退回原標題 """
+    original = title
     # 移除 [720p], (1080p), [HD], - 備用 等後綴
     title = re.sub(r'\[.*?\]|\(.*?\)', '', title)
     title = re.sub(r'(HD|SD|FHD|4K|1080p|720p|480p)', '', title, flags=re.IGNORECASE)
-    title = title.replace("-", "").replace("_", "").strip()
-    return title if title else "未知頻道"
+    title = title.replace("_", " ").strip()
+    return title if title else original
 
 def is_stream_platform_channel(title, url):
     """ 判斷是否為鬥魚、虎牙等網路直播平台的頻道 """
@@ -136,7 +137,7 @@ def search_github_playlist_files():
     return valid_files
 
 def parse_playlist_content(raw_url):
-    """ 解析內容、檢查中文標題並自動排除直播平台 """
+    """ 解析內容，確保精準抓取並整理中文頻道 """
     channels = []
     try:
         res = requests.get(raw_url, headers=HEADERS, timeout=10)
@@ -148,34 +149,36 @@ def parse_playlist_content(raw_url):
             
             temp_channels = []
             has_chinese_title = False
-            current_title = ""
+            current_raw_title = ""
             
             for line in lines:
-                # M3U 格式
+                # M3U 格式解析
                 if line.startswith("#EXTINF:"):
                     parts = line.split(",", 1)
                     if len(parts) > 1:
-                        current_title = clean_title(parts[1].strip())
-                        if re.search(r'[\u4e00-\u9fa5]', current_title):
+                        current_raw_title = parts[1].strip()
+                        if re.search(r'[\u4e00-\u9fa5]', current_raw_title):
                             has_chinese_title = True
 
                 elif line.startswith("http://") or line.startswith("https://"):
-                    if current_title:
-                        if not is_stream_platform_channel(current_title, line):
-                            temp_channels.append((current_title, line))
-                        current_title = ""
+                    if current_raw_title:
+                        if not is_stream_platform_channel(current_raw_title, line):
+                            final_title = clean_title(current_raw_title)
+                            temp_channels.append((final_title, line))
+                        current_raw_title = ""
 
-                # TXT 格式 (頻道名,網址)
+                # TXT 格式解析 (頻道名,網址)
                 elif "," in line and "://" in line and not line.startswith("#"):
                     parts = line.split(",", 1)
-                    title = clean_title(parts[0].strip())
+                    raw_title = parts[0].strip()
                     url = parts[1].strip()
                     
-                    if re.search(r'[\u4e00-\u9fa5]', title):
+                    if re.search(r'[\u4e00-\u9fa5]', raw_title):
                         has_chinese_title = True
                     
-                    if not is_stream_platform_channel(title, url):
-                        temp_channels.append((title, url))
+                    if not is_stream_platform_channel(raw_title, url):
+                        final_title = clean_title(raw_title)
+                        temp_channels.append((final_title, url))
 
             if has_chinese_title:
                 print(f"  └ [符合條件] 成功提取 {len(temp_channels)} 個頻道！")
@@ -192,7 +195,6 @@ def parse_playlist_content(raw_url):
 def main():
     found_files = search_github_playlist_files()
     
-    # 使用字典將相同名稱的頻道進行歸類整合： { "頻道名稱": [ "url1", "url2", ... ] }
     channel_dict = {}
     seen_urls = set()
 
@@ -219,7 +221,6 @@ def main():
     else:
         print("\n未搜尋到符合條件的檔案。")
 
-    # 針對頻道名稱進行 Alphabetical / 筆畫排序
     sorted_titles = sorted(channel_dict.keys())
     total_urls = sum(len(urls) for urls in channel_dict.values())
 
@@ -231,7 +232,6 @@ def main():
         f.write("#EXTM3U\n")
         for title in sorted_titles:
             for url in channel_dict[title]:
-                # 寫入標準多來源結構，tvg-name 設為清洗後的標準名稱
                 f.write(f'#EXTINF:-1 group-title="GitHub搜集" tvg-name="{title}",{title}\n{url}\n')
 
     print("整理與寫入完成！")
