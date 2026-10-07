@@ -1,7 +1,7 @@
 name: Auto IPTV Check
 
 on:
-  schedule:
+#  schedule:
 #    - cron: '0 0 * * *'  # 每天自動執行
   workflow_dispatch:      # 允許手動觸發
 
