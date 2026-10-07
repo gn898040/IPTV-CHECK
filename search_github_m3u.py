@@ -8,11 +8,16 @@ from datetime import datetime, timedelta, timezone
 MAX_DAYS_OLD = 30
 OUTPUT_M3U = "Github_Collected.m3u"
 
-# 自動計算 30 天前的 UTC 日期字串 (YYYY-MM-DD)
-thirty_days_ago = (datetime.now(timezone.utc) - timedelta(days=MAX_DAYS_OLD)).strftime('%Y-%m-%d')
+# 30 天前的時間基準
+thirty_days_ago_dt = datetime.now(timezone.utc) - timedelta(days=MAX_DAYS_OLD)
 
-# 放寬搜尋語法：搜尋包含 m3u 或 txt 關鍵字且 30 天內有 push 的專案
-SEARCH_QUERY = f"(filename:playlist.m3u OR filename:playlist.txt OR filename:live.m3u OR filename:tv.m3u) pushed:>{thirty_days_ago}"
+# 精準且涵蓋廣的 GitHub 搜尋關鍵字 (搜尋包含 #EXTINF 的 M3U/TXT 檔案)
+SEARCH_QUERIES = [
+    "extm3u filename:playlist.m3u",
+    "extm3u filename:playlist.txt",
+    "extm3u filename:live.m3u",
+    "extm3u filename:tv.m3u"
+]
 
 GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", "") 
 
@@ -35,62 +40,65 @@ def is_file_updated_recently(owner, repo, path):
                 commit_date_str = commits[0]["commit"]["committer"]["date"]
                 commit_date = datetime.strptime(commit_date_str, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
                 
-                now = datetime.now(timezone.utc)
-                days_diff = (now - commit_date).days
-                
+                days_diff = (datetime.now(timezone.utc) - commit_date).days
                 if days_diff <= MAX_DAYS_OLD:
-                    print(f"  └ 檔案更新於 {days_diff} 天前 ({commit_date_str[:10]}) -> 符合近一個月條件！")
+                    print(f"  └ [符合時間] 檔案更新於 {days_diff} 天前 ({commit_date_str[:10]})")
                     return True
                 else:
-                    print(f"  └ 檔案最後更新於 {days_diff} 天前 -> 太舊，跳過。")
+                    print(f"  └ [跳過時間] 最後更新於 {days_diff} 天前 (超過 {MAX_DAYS_OLD} 天)")
                     return False
     except Exception as e:
-        print(f"  └ 無法取得 Commit 時間 ({e})，預設跳過。")
+        # 若無法取得 commit 時間，原則上允許下載檢測內容
+        print(f"  └ 無法取得 Commit 時間，預設放行檢測。")
+        return True
     return False
 
 def search_github_playlist_files():
-    """ 搜尋近一個月有更新的 IPTV 清單檔案 """
-    url = f"https://api.github.com/search/code?q={SEARCH_QUERY}&per_page=30"
+    """ 輪詢搜尋條件，搜集潛在 IPTV 清單 """
     valid_files = []
+    seen_paths = set()
     
-    print(f"1. 正在搜尋 GitHub 上最近 {MAX_DAYS_OLD} 天內 (pushed:>{thirty_days_ago}) 的 IPTV 清單...")
-    try:
-        res = requests.get(url, headers=HEADERS, timeout=10)
-        if res.status_code == 200:
-            data = res.json()
-            items = data.get("items", [])
-            print(f"搜尋成功！找到 {len(items)} 個潛在檔案，開始比對最後更新時間...\n")
-            
-            for item in items:
-                repo_full_name = item.get("repository", {}).get("full_name", "")
-                path = item.get("path", "")
+    print(f"1. 開始從 GitHub 搜尋熱門 IPTV 清單...")
+    for query in SEARCH_QUERIES:
+        url = f"https://api.github.com/search/code?q={query}&per_page=15"
+        try:
+            res = requests.get(url, headers=HEADERS, timeout=10)
+            if res.status_code == 200:
+                data = res.json()
+                items = data.get("items", [])
+                print(f"  └ 查詢 '{query}' 找到 {len(items)} 個結果")
                 
-                if not repo_full_name or not path:
-                    continue
+                for item in items:
+                    repo_full_name = item.get("repository", {}).get("full_name", "")
+                    path = item.get("path", "")
+                    unique_key = f"{repo_full_name}/{path}"
                     
-                owner, repo_name = repo_full_name.split("/")
-                print(f"檢查專案: [{repo_full_name}] 檔案: {path}")
-                
-                if is_file_updated_recently(owner, repo_name, path):
-                    html_url = item.get("html_url", "")
-                    raw_url = html_url.replace("github.com", "raw.githubusercontent.com").replace("/blob/", "/")
-                    valid_files.append({
-                        "repo": repo_full_name,
-                        "raw_url": raw_url,
-                        "path": path
-                    })
-                time.sleep(0.5)
-        elif res.status_code == 403:
-            print("觸發 GitHub API 速率限制！請確認已帶入 GITHUB_TOKEN。")
-        else:
-            print(f"API 請求失敗，狀態碼: {res.status_code}")
-    except Exception as e:
-        print(f"搜尋發生錯誤: {e}")
-        
+                    if not repo_full_name or not path or unique_key in seen_paths:
+                        continue
+                    
+                    seen_paths.add(unique_key)
+                    owner, repo_name = repo_full_name.split("/")
+                    
+                    print(f"\n檢查專案: [{repo_full_name}] 檔案: {path}")
+                    if is_file_updated_recently(owner, repo_name, path):
+                        html_url = item.get("html_url", "")
+                        raw_url = html_url.replace("github.com", "raw.githubusercontent.com").replace("/blob/", "/")
+                        valid_files.append({
+                            "repo": repo_full_name,
+                            "raw_url": raw_url,
+                            "path": path
+                        })
+                    time.sleep(0.5)
+            elif res.status_code == 403:
+                print("  └ 觸發 GitHub API 速率限制，停止後續搜尋。")
+                break
+        except Exception as e:
+            print(f"搜尋 '{query}' 發生錯誤: {e}")
+            
     return valid_files
 
 def parse_playlist_content(raw_url):
-    """ 支援 M3U 與 TXT 格式，並精準過濾頻道名稱含有中文的來源 """
+    """ 解析 M3U / TXT 內容並檢查頻道標題是否含有中文字 """
     channels = []
     try:
         res = requests.get(raw_url, headers=HEADERS, timeout=10)
@@ -106,7 +114,7 @@ def parse_playlist_content(raw_url):
             current_title = ""
             
             for line in lines:
-                # M3U 格式解析
+                # M3U 格式
                 if line.startswith("#EXTINF:"):
                     current_inf = line
                     parts = line.split(",", 1)
@@ -116,12 +124,12 @@ def parse_playlist_content(raw_url):
                             has_chinese_title = True
 
                 elif line.startswith("http://") or line.startswith("https://"):
-                    if current_inf: # M3U 格式
+                    if current_inf:
                         temp_channels.append((current_title, current_inf, line))
                         current_inf = ""
                         current_title = ""
 
-                # TXT 格式解析 (例如: TVBS新聞台,http://...)
+                # TXT 格式 (例如: TVBS新聞台,http://...)
                 elif "," in line and "://" in line and not line.startswith("#"):
                     parts = line.split(",", 1)
                     title = parts[0].strip()
@@ -134,10 +142,10 @@ def parse_playlist_content(raw_url):
                     temp_channels.append((title, extinf, url))
 
             if has_chinese_title:
-                print(f"  └ [符合] 找到包含中文名稱的頻道，提取全數頻道...")
+                print(f"  └ [符合中文] 成功提取 {len(temp_channels)} 個頻道！")
                 return [(inf, url) for title, inf, url in temp_channels]
             else:
-                print(f"  └ [跳過] 檔案內所有頻道的名稱均無中文字。")
+                print(f"  └ [跳過中文] 檔案內頻道名稱均無中文標題。")
                 return []
                 
     except Exception as e:
@@ -168,11 +176,10 @@ def main():
                     new_count += 1
                     
             if channels:
-                print(f"  └ 成功提取 {new_count} 個新頻道")
+                print(f"  └ 新增不重複頻道: {new_count} 個")
     else:
         print("\n未搜尋到符合條件的檔案。")
 
-    # 關鍵防呆：無論是否找到頻道，強制建立/更新檔案，避免 Actions 找不到檔案報錯
     print(f"\n3. 寫入搜集成果至 {OUTPUT_M3U} (共 {len(all_channels)} 個不重複頻道)...")
     with open(OUTPUT_M3U, "w", encoding="utf-8") as f:
         f.write("#EXTM3U\n")
