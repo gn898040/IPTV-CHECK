@@ -8,13 +8,30 @@ from datetime import datetime, timedelta, timezone
 MAX_DAYS_OLD = 30
 OUTPUT_M3U = "Github_Collected.m3u"
 
-# 廣義關鍵字 (完全不加 pushed API 限制，避免被 GitHub 封鎖搜尋結果)
+# 廣義關鍵字
 SEARCH_QUERIES = [
     "filename:playlist.m3u",
     "filename:playlist.txt",
     "filename:live.m3u",
     "filename:tv.m3u",
     "extm3u IPTV"
+]
+
+# --- 專門排除「網路直播平台」的關鍵字（名稱 & 網址）---
+EXCLUDE_KEYWORDS = [
+    # 平台名稱與特徵
+    "鬥魚", "斗鱼", "douyu",
+    "虎牙", "huya",
+    "嗶哩嗶哩", "哔哩哔哩", "bilibili", "b站",
+    "YY直播", "yy.com",
+    "抖音", "douyin",
+    "快手", "kuaishou",
+    "twitch",
+    "章魚", "zhangyu",
+    "企鵝電競", "egame",
+    "花椒", "huajiao",
+    "映客", "inke",
+    "網易CC", "163.com/cc"
 ]
 
 GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", "") 
@@ -27,8 +44,19 @@ HEADERS = {
 if GITHUB_TOKEN:
     HEADERS["Authorization"] = f"token {GITHUB_TOKEN}"
 
+def is_stream_platform_channel(title, url):
+    """ 判斷是否為鬥魚、虎牙等網路直播平台的頻道 """
+    text_to_check = f"{title} {url}".lower()
+    
+    # 只要標題或網址裡面包含任何直播平台的關鍵字，就回傳 True (代表要排除)
+    for kw in EXCLUDE_KEYWORDS:
+        if kw in text_to_check:
+            return True
+            
+    return False
+
 def is_file_updated_recently(owner, repo, path):
-    """ 用 Python 精準檢查檔案最後 Commit 是否在最近 MAX_DAYS_OLD 天內 """
+    """ 檢查檔案最後 Commit 是否在最近 MAX_DAYS_OLD 天內 """
     url = f"https://api.github.com/repos/{owner}/{repo}/commits?path={path}&page=1&per_page=1"
     try:
         res = requests.get(url, headers=HEADERS, timeout=8)
@@ -51,7 +79,7 @@ def is_file_updated_recently(owner, repo, path):
     return False
 
 def search_github_playlist_files():
-    """ 搜尋專案並透過 Python 進行雙重篩選 """
+    """ 搜尋專案並進行雙重篩選 """
     valid_files = []
     seen_paths = set()
     
@@ -59,7 +87,6 @@ def search_github_playlist_files():
     
     for query in SEARCH_QUERIES:
         print(f"\n[執行搜尋]: {query}")
-        # 翻頁搜尋第 1~2 頁
         for page in range(1, 3):
             url = f"https://api.github.com/search/code?q={query}&per_page=30&page={page}"
             try:
@@ -92,7 +119,7 @@ def search_github_playlist_files():
                                 "raw_url": raw_url,
                                 "path": path
                             })
-                        time.sleep(0.3) # 短暫停頓避免 Rate Limit
+                        time.sleep(0.3)
                 elif res.status_code == 403:
                     print("  └ 觸發 GitHub API Rate Limit，跳過此查詢。")
                     break
@@ -105,7 +132,7 @@ def search_github_playlist_files():
     return valid_files
 
 def parse_playlist_content(raw_url):
-    """ 解析內容並檢查頻道標題是否含有中文字 """
+    """ 解析內容、檢查中文標題，並自動排除鬥魚/虎牙等網路直播平台 """
     channels = []
     try:
         res = requests.get(raw_url, headers=HEADERS, timeout=10)
@@ -132,7 +159,9 @@ def parse_playlist_content(raw_url):
 
                 elif line.startswith("http://") or line.startswith("https://"):
                     if current_inf:
-                        temp_channels.append((current_title, current_inf, line))
+                        # 關鍵：排除鬥魚/虎牙等網路直播源
+                        if not is_stream_platform_channel(current_title, line):
+                            temp_channels.append((current_title, current_inf, line))
                         current_inf = ""
                         current_title = ""
 
@@ -145,11 +174,13 @@ def parse_playlist_content(raw_url):
                     if re.search(r'[\u4e00-\u9fa5]', title):
                         has_chinese_title = True
                     
-                    extinf = f'#EXTINF:-1 group-title="GitHub搜集",{title}'
-                    temp_channels.append((title, extinf, url))
+                    # 關鍵：排除鬥魚/虎牙等網路直播源
+                    if not is_stream_platform_channel(title, url):
+                        extinf = f'#EXTINF:-1 group-title="GitHub搜集",{title}'
+                        temp_channels.append((title, extinf, url))
 
             if has_chinese_title:
-                print(f"  └ [含有中文] 成功提取 {len(temp_channels)} 個頻道！")
+                print(f"  └ [符合條件] 成功提取 {len(temp_channels)} 個頻道 (已濾除鬥魚/虎牙等直播網)！")
                 return [(inf, url) for title, inf, url in temp_channels]
             else:
                 print(f"  └ [無中文] 跳過此檔案。")
