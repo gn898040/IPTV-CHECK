@@ -43,6 +43,13 @@ def clean_title(title):
     title = title.replace("_", " ").strip()
     return title if title else original
 
+def extract_group_title(inf_line):
+    """ 從原始 #EXTINF 行提取 group-title，若無則回傳預設值 """
+    match = re.search(r'group-title="([^"]+)"', inf_line, re.IGNORECASE)
+    if match:
+        return match.group(1).strip()
+    return "GitHub搜集"
+
 def is_stream_platform(title, url):
     check_text = f"{title} {url}".lower()
     for kw in EXCLUDE_STREAM_PLATFORMS:
@@ -60,7 +67,6 @@ def is_valid_chinese_or_tv_channel(title, full_text):
     return False
 
 def safe_github_request(url):
-    """ 帶有 429 / 403 自動退避等待機制的請求函數 """
     for attempt in range(3):
         res = requests.get(url, headers=HEADERS, timeout=10)
         if res.status_code == 200:
@@ -82,7 +88,6 @@ def is_file_updated_recently(owner, repo, path):
             if commits:
                 commit_date_str = commits[0]["commit"]["committer"]["date"]
                 commit_date = datetime.strptime(commit_date_str, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
-                
                 days_diff = (datetime.now(timezone.utc) - commit_date).days
                 if days_diff <= MAX_DAYS_OLD:
                     print(f"  └ [時間符合] 檔案更新於 {days_diff} 天前 ({commit_date_str[:10]})")
@@ -103,7 +108,7 @@ def search_github_playlist_files():
     
     for query in SEARCH_QUERIES:
         print(f"\n[執行搜尋]: {query}")
-        for page in range(1, 3): # 抓取前 2 頁即可，控制請求量
+        for page in range(1, 3):
             url = f"https://api.github.com/search/code?q={query}&sort=indexed&order=desc&per_page=20&page={page}"
             try:
                 res = safe_github_request(url)
@@ -135,7 +140,7 @@ def search_github_playlist_files():
                                 "raw_url": raw_url,
                                 "path": path
                             })
-                        time.sleep(0.8) # 拉長間隔至 0.8 秒，避免觸發 429
+                        time.sleep(0.8)
                 else:
                     break
             except Exception as e:
@@ -156,9 +161,12 @@ def parse_playlist_content(raw_url):
             
             temp_channels = []
             current_raw_title = ""
+            current_group = "GitHub搜集"
             
             for line in lines:
+                # M3U 格式解析
                 if line.startswith("#EXTINF:"):
+                    current_group = extract_group_title(line)
                     parts = line.split(",", 1)
                     if len(parts) > 1:
                         current_raw_title = parts[1].strip()
@@ -168,9 +176,11 @@ def parse_playlist_content(raw_url):
                         if not is_stream_platform(current_raw_title, line):
                             if is_valid_chinese_or_tv_channel(current_raw_title, text):
                                 final_title = clean_title(current_raw_title)
-                                temp_channels.append((final_title, current_raw_title, line))
+                                temp_channels.append((final_title, current_group, line))
                         current_raw_title = ""
+                        current_group = "GitHub搜集"
 
+                # TXT 格式解析 (頻道名,網址)
                 elif "," in line and "://" in line and not line.startswith("#"):
                     parts = line.split(",", 1)
                     raw_title = parts[0].strip()
@@ -179,7 +189,7 @@ def parse_playlist_content(raw_url):
                     if not is_stream_platform(raw_title, url):
                         if is_valid_chinese_or_tv_channel(raw_title, text):
                             final_title = clean_title(raw_title)
-                            temp_channels.append((final_title, raw_title, url))
+                            temp_channels.append((final_title, "GitHub搜集", url))
 
             if temp_channels:
                 print(f"  └ [成功提取] 找到 {len(temp_channels)} 個頻道！")
@@ -196,6 +206,7 @@ def parse_playlist_content(raw_url):
 def main():
     found_files = search_github_playlist_files()
     
+    # 字典： {"標準頻道名": [ (group_title, stream_url), ... ]}
     channel_dict = {}
     seen_urls = set()
 
@@ -209,13 +220,13 @@ def main():
             
             channels = parse_playlist_content(raw_url)
             new_count = 0
-            for clean_t, raw_t, stream_url in channels:
+            for clean_t, group_t, stream_url in channels:
                 if stream_url not in seen_urls:
                     seen_urls.add(stream_url)
                     
                     if clean_t not in channel_dict:
                         channel_dict[clean_t] = []
-                    channel_dict[clean_t].append((raw_t, stream_url))
+                    channel_dict[clean_t].append((group_t, stream_url))
                     new_count += 1
                     
             if channels:
@@ -233,8 +244,9 @@ def main():
     with open(OUTPUT_M3U, "w", encoding="utf-8") as f:
         f.write("#EXTM3U\n")
         for clean_t in sorted_titles:
-            for raw_t, stream_url in channel_dict[clean_t]:
-                f.write(f'#EXTINF:-1 group-title="GitHub搜集" tvg-name="{clean_t}",{clean_t}\n{stream_url}\n')
+            for group_t, stream_url in channel_dict[clean_t]:
+                # 動態帶入抓取到的 group_t，完美保留原本的頻道分類！
+                f.write(f'#EXTINF:-1 group-title="{group_t}" tvg-name="{clean_t}",{clean_t}\n{stream_url}\n')
 
     print("搜集與同名整理完成！")
 
