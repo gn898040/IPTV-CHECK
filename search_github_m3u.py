@@ -8,13 +8,12 @@ from datetime import datetime, timedelta, timezone
 MAX_DAYS_OLD = 30
 OUTPUT_M3U = "Github_Collected.m3u"
 
-# 廣義關鍵字
+# 使用涵蓋面最廣的搜尋關鍵字，避免過於複雜的 Qualifier 被 GitHub API 拒絕
 SEARCH_QUERIES = [
     "filename:playlist.m3u",
     "filename:playlist.txt",
     "filename:live.m3u",
-    "filename:tv.m3u",
-    "extm3u IPTV"
+    "m3u tvg-name"
 ]
 
 # 專門排除「網路直播平台」關鍵字
@@ -25,28 +24,27 @@ EXCLUDE_KEYWORDS = [
     "YY直播", "yy.com",
     "抖音", "douyin",
     "快手", "kuaishou",
-    "twitch",
-    "章魚", "zhangyu",
-    "企鵝電競", "egame",
-    "花椒", "huajiao",
-    "映客", "inke",
-    "網易CC", "163.com/cc"
+    "twitch", "章魚", "zhangyu", "企鵝電競", "egame",
+    "花椒", "huajiao", "映客", "inke", "網易CC"
 ]
 
-GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", "") 
+GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", "").strip()
 
 HEADERS = {
-    "User-Agent": "VLC/3.0.9 LibVLC/3.0.9",
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
     "Accept": "application/vnd.github.v3+json"
 }
 
+# 確保 Token 格式正確傳入
 if GITHUB_TOKEN:
-    HEADERS["Authorization"] = f"token {GITHUB_TOKEN}"
+    HEADERS["Authorization"] = f"Bearer {GITHUB_TOKEN}"
+    print("已成功載入 GITHUB_TOKEN進行身份驗證！")
+else:
+    print("警告：未檢測到 GITHUB_TOKEN，將以匿名模式請求（極易被限流）。")
 
 def clean_title(title):
-    """ 安全地清理頻道名稱雜訊，若清洗後變空白則退回原標題 """
+    """ 安全地清理頻道名稱雜訊 """
     original = title
-    # 移除 [720p], (1080p), [HD], - 備用 等後綴
     title = re.sub(r'\[.*?\]|\(.*?\)', '', title)
     title = re.sub(r'(HD|SD|FHD|4K|1080p|720p|480p)', '', title, flags=re.IGNORECASE)
     title = title.replace("_", " ").strip()
@@ -61,7 +59,7 @@ def is_stream_platform_channel(title, url):
     return False
 
 def is_file_updated_recently(owner, repo, path):
-    """ 檢查檔案最後 Commit 是否在最近 MAX_DAYS_OLD 天內 """
+    """ 用 Python 精準檢查檔案最後 Commit 是否在最近 30 天內 """
     url = f"https://api.github.com/repos/{owner}/{repo}/commits?path={path}&page=1&per_page=1"
     try:
         res = requests.get(url, headers=HEADERS, timeout=8)
@@ -70,8 +68,8 @@ def is_file_updated_recently(owner, repo, path):
             if commits:
                 commit_date_str = commits[0]["commit"]["committer"]["date"]
                 commit_date = datetime.strptime(commit_date_str, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
-                
                 days_diff = (datetime.now(timezone.utc) - commit_date).days
+                
                 if days_diff <= MAX_DAYS_OLD:
                     print(f"  └ [時間符合] 檔案更新於 {days_diff} 天前 ({commit_date_str[:10]})")
                     return True
@@ -88,56 +86,48 @@ def search_github_playlist_files():
     valid_files = []
     seen_paths = set()
     
-    print(f"1. 開始從 GitHub 搜尋熱門 IPTV 清單...")
+    print(f"\n1. 開始從 GitHub 搜尋熱門 IPTV 清單...")
     
     for query in SEARCH_QUERIES:
         print(f"\n[執行搜尋]: {query}")
-        for page in range(1, 3):
-            url = f"https://api.github.com/search/code?q={query}&per_page=30&page={page}"
-            try:
-                res = requests.get(url, headers=HEADERS, timeout=10)
-                if res.status_code == 200:
-                    data = res.json()
-                    items = data.get("items", [])
-                    if not items:
-                        break
-                        
-                    print(f"  └ 第 {page} 頁找到 {len(items)} 個檔案，開始驗證更新時間...")
-                    
-                    for item in items:
-                        repo_full_name = item.get("repository", {}).get("full_name", "")
-                        path = item.get("path", "")
-                        unique_key = f"{repo_full_name}/{path}"
-                        
-                        if not repo_full_name or not path or unique_key in seen_paths:
-                            continue
-                        
-                        seen_paths.add(unique_key)
-                        owner, repo_name = repo_full_name.split("/")
-                        
-                        print(f"檢查: [{repo_full_name}] -> {path}")
-                        if is_file_updated_recently(owner, repo_name, path):
-                            html_url = item.get("html_url", "")
-                            raw_url = html_url.replace("github.com", "raw.githubusercontent.com").replace("/blob/", "/")
-                            valid_files.append({
-                                "repo": repo_full_name,
-                                "raw_url": raw_url,
-                                "path": path
-                            })
-                        time.sleep(0.3)
-                elif res.status_code == 403:
-                    print("  └ 觸發 GitHub API Rate Limit，跳過此查詢。")
-                    break
-                else:
-                    break
-            except Exception as e:
-                print(f"  └ 搜尋發生錯誤: {e}")
-                break
+        url = f"https://api.github.com/search/code?q={query}&per_page=30&page=1"
+        try:
+            res = requests.get(url, headers=HEADERS, timeout=10)
+            if res.status_code == 200:
+                data = res.json()
+                items = data.get("items", [])
+                print(f"  └ 搜尋成功！共找到 {len(items)} 個潛在檔案，開始驗證更新時間...")
                 
+                for item in items:
+                    repo_full_name = item.get("repository", {}).get("full_name", "")
+                    path = item.get("path", "")
+                    unique_key = f"{repo_full_name}/{path}"
+                    
+                    if not repo_full_name or not path or unique_key in seen_paths:
+                        continue
+                    
+                    seen_paths.add(unique_key)
+                    owner, repo_name = repo_full_name.split("/")
+                    
+                    print(f"檢查: [{repo_full_name}] -> {path}")
+                    if is_file_updated_recently(owner, repo_name, path):
+                        html_url = item.get("html_url", "")
+                        raw_url = html_url.replace("github.com", "raw.githubusercontent.com").replace("/blob/", "/")
+                        valid_files.append({
+                            "repo": repo_full_name,
+                            "raw_url": raw_url,
+                            "path": path
+                        })
+                    time.sleep(0.5)
+            else:
+                print(f"  └ API 請求未成功 (HTTP 狀態碼: {res.status_code})，原因: {res.text[:150]}")
+        except Exception as e:
+            print(f"  └ 搜尋發生錯誤: {e}")
+            
     return valid_files
 
 def parse_playlist_content(raw_url):
-    """ 解析內容，確保精準抓取並整理中文頻道 """
+    """ 解析內容並過濾中文頻道與直播平台 """
     channels = []
     try:
         res = requests.get(raw_url, headers=HEADERS, timeout=10)
@@ -167,7 +157,7 @@ def parse_playlist_content(raw_url):
                             temp_channels.append((final_title, line))
                         current_raw_title = ""
 
-                # TXT 格式解析 (頻道名,網址)
+                # TXT 格式解析
                 elif "," in line and "://" in line and not line.startswith("#"):
                     parts = line.split(",", 1)
                     raw_title = parts[0].strip()
