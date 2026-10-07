@@ -18,16 +18,16 @@ M3U_SOURCES = [
         "group": "TW"  # 強制分類為 TW
     },
     {
+        "url": "https://raw.githubusercontent.com/imDazui/Tvlist-awesome-m3u-m3u8/master/m3u/%E5%8F%B0%E6%B9%BE%E9%A6%99%E6%B8%AF%E6%BE%B3%E9%97%A8202506.m3u",
+        "group": "TW2頻道"  # 強制分類為 頻道
+    },
+    {
         "url": "https://gist.githubusercontent.com/tony881025/4ed30002f87b9e4231f47a0a6334d110/raw/4ef0d06fdd1f10411b700957aed714ee94318919/gistfile1.txt",
         "group": "X頻道"  # 強制分類為 X頻道
     },
     {
         "url": "https://raw.githubusercontent.com/xiongjian83/TvBox/refs/heads/main/18.txt",
         "group": "X頻道"  # 強制分類為 X頻道
-    },
-{
-        "url": "https://raw.githubusercontent.com/imDazui/Tvlist-awesome-m3u-m3u8/master/m3u/%E5%8F%B0%E6%B9%BE%E9%A6%99%E6%B8%AF%E6%BE%B3%E9%97%A8202506.m3u",
-        "group": "TW2頻道"  # 強制分類為 X頻道
     }
 ]
 
