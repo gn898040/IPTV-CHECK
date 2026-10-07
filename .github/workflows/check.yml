@@ -32,6 +32,7 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add Playlist.m3u
+          git add *.m3u
           git commit -m "Auto update Playlist.m3u" || exit 0
+          git pull --rebase origin main  # 關鍵：Push 前先拉取遠端最新修改並合併！
           git push
