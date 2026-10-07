@@ -26,6 +26,10 @@ M3U_SOURCES = [
         "group": "X頻道"  # 強制分類為 X頻道
     },
     {
+        "url": "https://github.com/hujingguang/ChinaIPTV/raw/refs/heads/main/xxx.m3u8",
+        "group": "X頻道"  # 強制分類為 X頻道
+    },
+    {
         "url": "https://raw.githubusercontent.com/xiongjian83/TvBox/refs/heads/main/18.txt",
         "group": "X頻道"  # 強制分類為 X頻道
     }
