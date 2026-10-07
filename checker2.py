@@ -22,7 +22,7 @@ M3U_SOURCES = [
 
 OUTPUT_M3U = "Playlist2.m3u"     # 輸出的存活 M3U 檔名
 MAX_WORKERS = 8                 # 併發執行緒數
-TIMEOUT = 8                     # 連線超時時間 (秒)
+TIMEOUT = 10                     # 連線超時時間 (秒)
 
 # 模擬 VLC 播放器 Header
 HEADERS = {
