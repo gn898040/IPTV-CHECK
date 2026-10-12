@@ -38,7 +38,6 @@ M3U_SOURCES = [
 
 OUTPUT_M3U = "Playlist.m3u"     # 輸出的存活 M3U 檔名
 MAX_WORKERS = 10                 # 併發執行緒數 (GitHub Actions 建議 8-10)
-TIMEOUT = 10                    # 連線超時時間 (秒)
 
 HEADERS = {
     "User-Agent": "VLC/3.0.9 LibVLC/3.0.9",
@@ -110,12 +109,23 @@ def parse_m3u_text(text, default_group):
     return channels
 
 def check_channel_deep(ch, retry=1):
-    """ 深度串流檢測 (含失敗重試) """
+    """ 深度串流檢測 (含 Content-Type 嚴格過濾與失敗重試) """
     url = ch["url"]
     for attempt in range(retry + 1):
         try:
-            with requests.get(url, headers=HEADERS, timeout=TIMEOUT, stream=True, allow_redirects=True) as response:
+            # 關鍵修改 1：設定 (連線超時 5 秒, 讀取資料超時 5 秒) 防止無限卡死
+            with requests.get(url, headers=HEADERS, timeout=(5, 5), stream=True, allow_redirects=True) as response:
                 if response.status_code in [200, 206]:
+                    
+                    # 關鍵修改 2：抓取 HTTP 標頭的 Content-Type
+                    content_type = response.headers.get("Content-Type", "").lower()
+                    
+                    # 致命過濾：如果回傳的是網頁 (text/html) 或 JSON 錯誤 (application/json)
+                    # 絕對是被阻擋或過期的假訊號，直接中斷驗證，不再重試！
+                    if "text/html" in content_type or "application/json" in content_type:
+                        break
+                        
+                    # 讀取一小段影片封包資料確保真的有影像
                     for chunk in response.iter_content(chunk_size=1024):
                         if chunk:
                             print(f"[OK - 串流正常] [{ch['group']}] {ch['title']}")
