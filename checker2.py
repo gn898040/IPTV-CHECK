@@ -23,8 +23,8 @@ M3U_SOURCES = [
 #        "group": "TW2頻道"
 #    },
     {
-        "url": "https://gist.githubusercontent.com/tony881025/4ed30002f87b9e4231f47a0a6334d110/raw/4ef0d06fdd1f10411b700957aed714ee94318919/gistfile1.txt",
-        "group": "X頻道"
+        "url": "https://raw.githubusercontent.com/gn898040/IPTV-CHECK/refs/heads/main/Github_Collected.m3u",
+        "group": None  # 保留原分類 (自動轉繁體)
     }
 ]
 
