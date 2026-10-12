@@ -15,6 +15,10 @@ M3U_SOURCES = [
         "group": None  # 保留原分類 (自動轉繁體)
     },
     {
+        "url": "https://raw.githubusercontent.com/gn898040/IPTV-CHECK/refs/heads/main/Github_Collected.m3u",
+        "group": None  # 保留原分類 (自動轉繁體)
+    },
+    {
         "url": "https://iptv-org.github.io/iptv/countries/tw.m3u",
         "group": "TW"  # 強制分類為 TW
     },
@@ -35,6 +39,9 @@ M3U_SOURCES = [
         "group": "X頻道"
     }
 ]
+
+# 新增：目標保留的分類白名單 (自動進行繁體轉換比對)
+#TARGET_GROUPS = ["港澳台", "港·澳·台"]
 
 OUTPUT_M3U = "Playlist.m3u"     # 輸出的存活 M3U 檔名
 MAX_WORKERS = 10                 # 併發執行緒數 (GitHub Actions 建議 8-10)
