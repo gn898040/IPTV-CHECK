@@ -98,10 +98,9 @@ def is_file_updated_recently(owner, repo, path):
     return False
 
 def search_repositories_and_get_m3u():
-    """ 核心改動：搜尋 Repo -> 讀取根目錄 -> 驗證檔案 """
+    """ 搜尋 Repo -> 讀取根目錄 -> 驗證檔案 """
     valid_files = []
     
-    # 步驟 1 & 2：搜尋「直播源」專案，並依最近更新排序 (sort=updated)
     print(f"1. 開始搜尋 GitHub 專案：關鍵字 '{SEARCH_QUERY}'，依最近更新排序...")
     search_url = f"https://api.github.com/search/repositories?q={SEARCH_QUERY}&sort=updated&order=desc&per_page=20"
     
@@ -118,25 +117,21 @@ def search_repositories_and_get_m3u():
         repo = repo_item["name"]
         print(f"檢查專案: [{owner}/{repo}]")
         
-        # 步驟 3：只看「根目錄」(Root Directory) 的內容
         contents_url = f"https://api.github.com/repos/{owner}/{repo}/contents"
         c_res = safe_github_request(contents_url)
         time.sleep(1) # 溫和爬取，防鎖 API
         
         if c_res and c_res.status_code == 200:
             contents = c_res.json()
-            # 確保取得的是陣列 (代表這是一個資料夾結構)
             if isinstance(contents, list):
                 m3u_found = False
                 for item in contents:
-                    # 只過濾根目錄下的 "檔案" 且副檔名為 ".m3u"
                     if item["type"] == "file" and item["name"].lower().endswith(".m3u"):
                         m3u_found = True
                         path = item["path"]
                         raw_url = item["download_url"]
                         print(f"  └ 發現檔案: {path}")
                         
-                        # 步驟 4：限制 30 天內更新的檔案
                         if is_file_updated_recently(owner, repo, path):
                             valid_files.append({
                                 "repo": f"{owner}/{repo}",
@@ -152,7 +147,7 @@ def search_repositories_and_get_m3u():
     return valid_files
 
 def parse_playlist_content(raw_url):
-    """ 原有解析邏輯保持不變 """
+    """ 原有解析邏輯 """
     temp_channels = []
     try:
         res = requests.get(raw_url, headers=HEADERS, timeout=10)
@@ -192,7 +187,6 @@ def parse_playlist_content(raw_url):
     return temp_channels
 
 def main():
-    # 取得符合新邏輯的檔案清單
     found_files = search_repositories_and_get_m3u()
     
     channel_dict = {}
@@ -229,54 +223,7 @@ def main():
     print(f"   └ 共有 {len(sorted_titles)} 個不重複頻道名稱，合計 {total_urls} 條來源網址。")
     print(f"4. 寫入整合完畢的 M3U 清單至 {OUTPUT_M3U}...")
 
-    with open(OUTPUT_M3U, "w", encoding="utf-8") as f:
-        f.write("#EXTM3U\n")
-        for clean_t in sorted_titles:
-            for group_t, stream_url in channel_dict[clean_t]:
-                f.write(f'#EXTINF:-1 group-title="{group_t}" tvg-name="{clean_t}",{clean_t}\n{stream_url}\n')
-
-    print("\n搜集與同名整理完成！")
-
-if __name__ == "__main__":
-    def main():
-    # 取得符合新邏輯的檔案清單
-    found_files = search_repositories_and_get_m3u()
-    
-    channel_dict = {}
-    seen_urls = set()
-
-    if found_files:
-        print(f"\n2. 開始下載並驗證頻道清單 (共 {len(found_files)} 個檔案)...")
-        for item in found_files:
-            repo = item["repo"]
-            raw_url = item["raw_url"]
-            path = item["path"]
-            print(f"\n讀取檔案 [{repo}] -> {path}...")
-            
-            channels = parse_playlist_content(raw_url)
-            new_count = 0
-            for clean_t, group_t, stream_url in channels:
-                if stream_url not in seen_urls:
-                    seen_urls.add(stream_url)
-                    if clean_t not in channel_dict:
-                        channel_dict[clean_t] = []
-                    channel_dict[clean_t].append((group_t, stream_url))
-                    new_count += 1
-                    
-            if channels:
-                print(f"    └ 新增不重複頻道網址: {new_count} 個")
-    else:
-        print("\n未搜尋到符合條件的專案與檔案。")
-        return
-
-    sorted_titles = sorted(channel_dict.keys())
-    total_urls = sum(len(items) for items in channel_dict.values())
-
-    print(f"\n3. 正在將相同名稱頻道歸類整理...")
-    print(f"   └ 共有 {len(sorted_titles)} 個不重複頻道名稱，合計 {total_urls} 條來源網址。")
-    print(f"4. 寫入整合完畢的 M3U 清單至 {OUTPUT_M3U}...")
-
-    # --- 新增：用來統計 Group Title 數量的字典 ---
+    # 用來統計 Group Title 數量的字典
     group_counts = {}
 
     with open(OUTPUT_M3U, "w", encoding="utf-8") as f:
@@ -288,16 +235,14 @@ if __name__ == "__main__":
                 # 累加該群組的數量
                 group_counts[group_t] = group_counts.get(group_t, 0) + 1
 
-    # --- 新增：輸出統計表 ---
+    # 輸出統計表
     print("\n==========================================")
     print("      📊 群組分類 (Group Title) 統計表")
     print("==========================================")
     
-    # 將統計結果依照「數量」由大到小排序
     sorted_groups = sorted(group_counts.items(), key=lambda x: x[1], reverse=True)
     
     for g_name, count in sorted_groups:
-        # 使用排版讓視覺更整齊
         print(f" ► {g_name} : {count} 條串流")
         
     print("==========================================")
