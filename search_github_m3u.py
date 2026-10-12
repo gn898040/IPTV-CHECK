@@ -30,9 +30,9 @@ EXCLUDE_CHANNELS = [
     "測試頻道",
     "購物台",
     "購物",
-    "虎牙",
-    "YY頻道",
-    "密碼"
+    "🇨🇳虎牙直播",
+    "🇨🇳 YY频道",
+    "🇨🇳 NewTV"
 ]
 
 GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", "").strip()
