@@ -10,23 +10,14 @@ cc = OpenCC('s2twp')
 
 # --- 設定區 ---
 M3U_SOURCES = [
-#    {
-#        "url": "https://raw.githubusercontent.com/CCSH/IPTV/refs/heads/main/live.m3u",
-#        "group": None  # 保留原分類 (自動轉繁體)
-#    },
-#    {
-#        "url": "https://iptv-org.github.io/iptv/countries/tw.m3u",
-#        "group": "TW"  # 強制分類為 TW
-#    },
-#    {
-#        "url": "https://raw.githubusercontent.com/imDazui/Tvlist-awesome-m3u-m3u8/master/m3u/%E5%8F%B0%E6%B9%BE%E9%A6%99%E6%B8%AF%E6%BE%B3%E9%97%A8202506.m3u",
-#        "group": "TW2頻道"
-#    },
     {
         "url": "https://raw.githubusercontent.com/gn898040/IPTV-CHECK/refs/heads/main/Github_Collected.m3u",
         "group": None  # 保留原分類 (自動轉繁體)
     }
 ]
+
+# 新增：目標保留的分類白名單 (自動進行繁體轉換比對)
+TARGET_GROUPS = ["港澳台", "港·澳·台"]
 
 OUTPUT_M3U = "Playlist2.m3u"     # 輸出的存活 M3U 檔名
 MAX_WORKERS = 8                 # 併發執行緒數 (GitHub Actions 建議 8-10)
@@ -48,7 +39,7 @@ def clean_channel_title(title):
     return title
 
 def parse_m3u_text(text, default_group):
-    """ 解析 M3U 或 TXT 內容 """
+    """ 解析 M3U 或 TXT 內容，並僅保留指定的 group-title """
     channels = []
     lines = [line.strip() for line in text.splitlines() if line.strip()]
     
@@ -56,13 +47,16 @@ def parse_m3u_text(text, default_group):
     current_group = cc.convert(default_group) if default_group else "Default"
     current_logo = ""
     
+    # 預先將目標分類轉為繁體，避免簡繁體比對不一致
+    target_groups_tc = [cc.convert(g) for g in TARGET_GROUPS]
+    
     for line in lines:
         if line.startswith("#EXTINF:"):
             # 1. 抓取 tvg-logo
             logo_match = re.search(r'tvg-logo="([^"]*)"', line)
             current_logo = logo_match.group(1) if logo_match else ""
 
-            # 2. 抓取 group-title (使用正則避免切割例外)
+            # 2. 抓取 group-title
             if not default_group:
                 group_match = re.search(r'group-title="([^"]*)"', line)
                 if group_match:
@@ -80,24 +74,32 @@ def parse_m3u_text(text, default_group):
 
         elif line.startswith("http://") or line.startswith("https://"):
             final_group = cc.convert(default_group) if default_group else current_group
-            channels.append({
-                "title": current_title,
-                "url": line,
-                "group": final_group,
-                "logo": current_logo
-            })
+            
+            # 關鍵修改：過濾分類，只保留「港澳台」與「公告」
+            if final_group in target_groups_tc:
+                channels.append({
+                    "title": current_title,
+                    "url": line,
+                    "group": final_group,
+                    "logo": current_logo
+                })
+            
             current_title = "未知頻道"
             current_logo = ""
 
         elif "," in line and "://" in line: # 支援 TXT 格式 (頻道名,網址)
             parts = line.split(",", 1)
             raw_title = clean_channel_title(parts[0].strip())
-            channels.append({
-                "title": raw_title,
-                "url": parts[1].strip(),
-                "group": cc.convert(default_group) if default_group else "Default",
-                "logo": ""
-            })
+            final_group = cc.convert(default_group) if default_group else "Default"
+            
+            # 關鍵修改：TXT 格式同樣套用分類過濾
+            if final_group in target_groups_tc:
+                channels.append({
+                    "title": raw_title,
+                    "url": parts[1].strip(),
+                    "group": final_group,
+                    "logo": ""
+                })
 
     return channels
 
@@ -116,7 +118,6 @@ def check_channel_deep(ch, retry=1):
         except Exception:
             pass
         
-        # 失敗時稍作停頓後重試
         if attempt < retry:
             time.sleep(0.5)
             
@@ -136,13 +137,13 @@ def main():
             if res.status_code == 200:
                 parsed = parse_m3u_text(res.text, forced_group)
                 all_channels.extend(parsed)
-                print(f"成功載入 {len(parsed)} 個頻道")
+                print(f"成功提取符合條件的頻道: {len(parsed)} 個")
             else:
                 print(f"下載失敗，HTTP 狀態碼: {res.status_code}")
         except Exception as e:
             print(f"下載發生錯誤: {e}")
 
-    # 全域 Logo 收集字典 (讓同名頻道共享台標圖示)
+    # 全域 Logo 收集字典
     logo_dict = {}
     for ch in all_channels:
         if ch["logo"] and ch["title"] not in logo_dict:
@@ -154,12 +155,11 @@ def main():
     for ch in all_channels:
         if ch["url"] not in seen_urls:
             seen_urls.add(ch["url"])
-            # 若無台標則補上同名頻道的 Logo
             if not ch["logo"] and ch["title"] in logo_dict:
                 ch["logo"] = logo_dict[ch["title"]]
             unique_channels.append(ch)
 
-    print(f"\n2. 合計不重複頻道 {len(unique_channels)} 個，開始進行深度串流連通性檢測...")
+    print(f"\n2. 合計符合條件的不重複頻道 {len(unique_channels)} 個，開始進行深度串流連通性檢測...")
 
     alive_channels = []
     with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
@@ -169,7 +169,6 @@ def main():
             if res:
                 alive_channels.append(res)
 
-    # 按 分類 -> 頻道名稱 排序，讓輸出更美觀
     alive_channels.sort(key=lambda x: (x["group"], x["title"]))
 
     print(f"\n3. 檢測完成！真存活數量: {len(alive_channels)} / {len(unique_channels)}")
