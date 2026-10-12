@@ -5,11 +5,12 @@ import time
 from datetime import datetime, timezone
 
 # --- 設定區 ---
-MAX_DAYS_OLD = 30               # 限制條件 4：30天內更新的檔案
+MAX_DAYS_OLD = 30               # 限制條件：30天內更新的檔案
 OUTPUT_M3U = "Github_Collected.m3u"
-SEARCH_QUERY = "直播源"         # 限制條件 1：搜尋關鍵字
+OUTPUT_REPORT = "Report.txt"     # 統計報告輸出檔名
+SEARCH_QUERY = "直播源"         # 限制條件：搜尋關鍵字
 
-# 原有過濾條件保持不變
+# 原有過濾條件
 EXCLUDE_STREAM_PLATFORMS = [
     "鬥魚", "斗鱼", "douyu", "虎牙", "huya",
     "嗶哩嗶哩", "哔哩哔哩", "bilibili", "b站",
@@ -231,22 +232,33 @@ def main():
         for clean_t in sorted_titles:
             for group_t, stream_url in channel_dict[clean_t]:
                 f.write(f'#EXTINF:-1 group-title="{group_t}" tvg-name="{clean_t}",{clean_t}\n{stream_url}\n')
-                
-                # 累加該群組的數量
                 group_counts[group_t] = group_counts.get(group_t, 0) + 1
 
-    # 輸出統計表
-    print("\n==========================================")
-    print("      📊 群組分類 (Group Title) 統計表")
-    print("==========================================")
-    
+    # 製作統計報告內容
     sorted_groups = sorted(group_counts.items(), key=lambda x: x[1], reverse=True)
-    
+    report_lines = []
+    report_lines.append("==========================================")
+    report_lines.append("      📊 群組分類 (Group Title) 統計表")
+    report_lines.append("==========================================")
     for g_name, count in sorted_groups:
-        print(f" ► {g_name} : {count} 條串流")
-        
-    print("==========================================")
-    print("\n搜集、同名整理與統計完成！")
+        report_lines.append(f" ► {g_name} : {count} 條串流")
+    report_lines.append("==========================================")
+    report_lines.append(f"總計不重複頻道數: {len(sorted_titles)} 個")
+    report_lines.append(f"總計串流來源網址: {total_urls} 條")
+    report_lines.append(f"更新時間 (UTC): {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')}")
+    report_lines.append("==========================================")
+
+    report_text = "\n".join(report_lines)
+
+    # 1. 輸出至執行日誌
+    print("\n" + report_text)
+
+    # 2. 自動寫入 Report.txt 文字檔（方便在 GitHub 專案首頁隨時查看）
+    with open(OUTPUT_REPORT, "w", encoding="utf-8") as f:
+        f.write(report_text)
+
+    print(f"\n已將統計報告寫入至 {OUTPUT_REPORT}！")
+    print("搜集、同名整理與統計完成！")
 
 if __name__ == "__main__":
     main()
