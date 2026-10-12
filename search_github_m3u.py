@@ -26,15 +26,12 @@ EXCLUDE_STREAM_PLATFORMS = [
     "twitch", "章魚直播", "企鵝電競", "花椒直播", "映客", "網易CC"
 ]
 
-# --- 新增：自定義手動排除的頻道名稱關鍵字黑名單 ---
-# 只要頻道名稱中包含這裡的字眼，就會直接被過濾掉
 EXCLUDE_CHANNELS = [
     "測試頻道",
     "購物台",
     "購物",
-    "YY频道",
-    "🇨🇳 NewTV",
-    "🇨🇳虎牙直播",
+    "虎牙",
+    "YY頻道",
     "密碼"
 ]
 
@@ -55,6 +52,7 @@ def clean_title(title):
     title = title.replace("_", " ").strip()
     return title if title else original
 
+# --- 新增：提取原始分類的函數 ---
 def extract_group_title(inf_line):
     match = re.search(r'group-title="([^"]+)"', inf_line, re.IGNORECASE)
     if match:
@@ -68,14 +66,6 @@ def is_stream_platform(title, url):
             return True
     return False
 
-# --- 新增：黑名單檢查函數 ---
-def should_exclude_channel(title):
-    title_lower = title.lower()
-    for kw in EXCLUDE_CHANNELS:
-        if kw.lower() in title_lower:
-            return True
-    return False
-
 def is_valid_chinese_or_tv_channel(title, full_text):
     if re.search(r'[\u4e00-\u9fa5]', title):
         return True
@@ -86,6 +76,7 @@ def is_valid_chinese_or_tv_channel(title, full_text):
     return False
 
 def safe_github_request(url):
+    """ 帶有 429 / 403 自動退避等待機制的請求函數 """
     for attempt in range(3):
         res = requests.get(url, headers=HEADERS, timeout=10)
         if res.status_code == 200:
@@ -128,7 +119,7 @@ def search_github_playlist_files():
     
     for query in SEARCH_QUERIES:
         print(f"\n[執行搜尋]: {query}")
-        for page in range(1, 3):
+        for page in range(1, 3): # 抓取前 2 頁即可，控制請求量
             url = f"https://api.github.com/search/code?q={query}&sort=indexed&order=desc&per_page=20&page={page}"
             try:
                 res = safe_github_request(url)
@@ -160,7 +151,7 @@ def search_github_playlist_files():
                                 "raw_url": raw_url,
                                 "path": path
                             })
-                        time.sleep(0.8)
+                        time.sleep(0.8) # 拉長間隔至 0.8 秒，避免觸發 429
                 else:
                     break
             except Exception as e:
@@ -181,11 +172,11 @@ def parse_playlist_content(raw_url):
             
             temp_channels = []
             current_raw_title = ""
-            current_group = "GitHub搜集"
+            current_group = "GitHub搜集" # 新增：用來暫存擷取到的分類
             
             for line in lines:
                 if line.startswith("#EXTINF:"):
-                    current_group = extract_group_title(line)
+                    current_group = extract_group_title(line) # 新增：擷取原始分類
                     parts = line.split(",", 1)
                     if len(parts) > 1:
                         current_raw_title = parts[1].strip()
@@ -193,13 +184,12 @@ def parse_playlist_content(raw_url):
                 elif line.startswith("http://") or line.startswith("https://"):
                     if current_raw_title:
                         if not is_stream_platform(current_raw_title, line):
-                            # 新增：黑名單攔截
-                            if not should_exclude_channel(current_raw_title):
-                                if is_valid_chinese_or_tv_channel(current_raw_title, text):
-                                    final_title = clean_title(current_raw_title)
-                                    temp_channels.append((final_title, current_group, line))
+                            if is_valid_chinese_or_tv_channel(current_raw_title, text):
+                                final_title = clean_title(current_raw_title)
+                                # 改為傳遞 current_group 給主程式
+                                temp_channels.append((final_title, current_group, line))
                         current_raw_title = ""
-                        current_group = "GitHub搜集"
+                        current_group = "GitHub搜集" # 重置
 
                 elif "," in line and "://" in line and not line.startswith("#"):
                     parts = line.split(",", 1)
@@ -207,11 +197,10 @@ def parse_playlist_content(raw_url):
                     url = parts[1].strip()
                     
                     if not is_stream_platform(raw_title, url):
-                        # 新增：黑名單攔截
-                        if not should_exclude_channel(raw_title):
-                            if is_valid_chinese_or_tv_channel(raw_title, text):
-                                final_title = clean_title(raw_title)
-                                temp_channels.append((final_title, "GitHub搜集", url))
+                        if is_valid_chinese_or_tv_channel(raw_title, text):
+                            final_title = clean_title(raw_title)
+                            # TXT 沒有標籤，所以固定給預設分類
+                            temp_channels.append((final_title, "GitHub搜集", url))
 
             if temp_channels:
                 print(f"  └ [成功提取] 找到 {len(temp_channels)} 個頻道！")
@@ -241,6 +230,7 @@ def main():
             
             channels = parse_playlist_content(raw_url)
             new_count = 0
+            # 這裡接收從 parse 傳來的 group_t
             for clean_t, group_t, stream_url in channels:
                 if stream_url not in seen_urls:
                     seen_urls.add(stream_url)
@@ -266,6 +256,7 @@ def main():
         f.write("#EXTM3U\n")
         for clean_t in sorted_titles:
             for group_t, stream_url in channel_dict[clean_t]:
+                # 這裡不再寫死 "GitHub搜集"，而是動態寫入原始分類 (group_t)
                 f.write(f'#EXTINF:-1 group-title="{group_t}" tvg-name="{clean_t}",{clean_t}\n{stream_url}\n')
 
     print("搜集與同名整理完成！")
