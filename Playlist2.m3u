@@ -1,9 +1,269 @@
 #EXTM3U
-#EXTINF:-1 group-title="X頻道" tvg-name="松視1臺",松視1臺
-http://15.204.105.50:25461/live/G2s9zK2n9m/xDtwVfWM8T/88.ts
-#EXTINF:-1 group-title="X頻道" tvg-name="松視2臺",松視2臺
-http://15.204.105.50:25461/live/G2s9zK2n9m/xDtwVfWM8T/89.ts
-#EXTINF:-1 group-title="X頻道" tvg-name="松視3臺",松視3臺
-http://15.204.105.50:25461/live/G2s9zK2n9m/xDtwVfWM8T/90.ts
-#EXTINF:-1 group-title="X頻道" tvg-name="潘朵拉",潘朵拉
-http://15.204.105.50:25461/live/G2s9zK2n9m/xDtwVfWM8T/86.ts
+#EXTINF:-1 group-title="4K頻道" tvg-name="60PHLGHEVCEAC3測試",60PHLGHEVCEAC3測試
+https://cdn.jsdelivr.net/gh/feiyang666999/testvideo/hlg4kvideo/playlist.m3u8
+#EXTINF:-1 group-title="4K頻道" tvg-name="60PRH264AAC測試",60PRH264AAC測試
+https://cdn.jsdelivr.net/gh/feiyang666999/testvideo/sdr4kvideo/playlist.m3u8
+#EXTINF:-1 group-title="GitHub蒐集" tvg-name="MyCamTV Anal",MyCamTV Anal
+http://live.mycamtv.com/anal.m3u8
+#EXTINF:-1 group-title="GitHub蒐集" tvg-name="MyCamTV Arab Girls",MyCamTV Arab Girls
+http://live.mycamtv.com/arab.m3u8
+#EXTINF:-1 group-title="GitHub蒐集" tvg-name="MyCamTV Asian Girls",MyCamTV Asian Girls
+http://live.mycamtv.com/asian.m3u8
+#EXTINF:-1 group-title="GitHub蒐集" tvg-name="MyCamTV Big Ass Girls",MyCamTV Big Ass Girls
+http://live.mycamtv.com/bigass.m3u8
+#EXTINF:-1 group-title="GitHub蒐集" tvg-name="MyCamTV Blonde Girls",MyCamTV Blonde Girls
+http://live.mycamtv.com/blonde.m3u8
+#EXTINF:-1 group-title="GitHub蒐集" tvg-name="MyCamTV Blowjob",MyCamTV Blowjob
+http://live.mycamtv.com/blowjob.m3u8
+#EXTINF:-1 group-title="GitHub蒐集" tvg-name="MyCamTV Brunette Girls",MyCamTV Brunette Girls
+http://live.mycamtv.com/brunette.m3u8
+#EXTINF:-1 group-title="GitHub蒐集" tvg-name="MyCamTV Ebony Girls",MyCamTV Ebony Girls
+http://live.mycamtv.com/ebony.m3u8
+#EXTINF:-1 group-title="GitHub蒐集" tvg-name="MyCamTV Girls Squirt",MyCamTV Girls Squirt
+http://live.mycamtv.com/squirt.m3u8
+#EXTINF:-1 group-title="GitHub蒐集" tvg-name="MyCamTV Latina Girls",MyCamTV Latina Girls
+http://live.mycamtv.com/latina.m3u8
+#EXTINF:-1 group-title="GitHub蒐集" tvg-name="MyCamTV MILF",MyCamTV MILF
+http://live.mycamtv.com/milf.m3u8
+#EXTINF:-1 group-title="GitHub蒐集" tvg-name="MyCamTV Mature",MyCamTV Mature
+http://live.mycamtv.com/bigtits.m3u8
+#EXTINF:-1 group-title="GitHub蒐集" tvg-name="MyCamTV Medium Girls",MyCamTV Medium Girls
+http://live.mycamtv.com/medium.m3u8
+#EXTINF:-1 group-title="GitHub蒐集" tvg-name="MyCamTV Skinny Girls",MyCamTV Skinny Girls
+http://live.mycamtv.com/skinny.m3u8
+#EXTINF:-1 group-title="GitHub蒐集" tvg-name="MyCamTV White Girls",MyCamTV White Girls
+http://live.mycamtv.com/white.m3u8
+#EXTINF:-1 group-title="GitHub蒐集" tvg-name="上虞文化影院",上虞文化影院
+http://l.cztvcloud.com/channels/lantian/SXshangyu2/720p.m3u8?zzhed
+#EXTINF:-1 group-title="GitHub蒐集" tvg-name="上虞新商都",上虞新商都
+http://l.cztvcloud.com/channels/lantian/SXshangyu3/720p.m3u8?zzhed
+#EXTINF:-1 group-title="GitHub蒐集" tvg-name="上虞新聞綜合",上虞新聞綜合
+http://l.cztvcloud.com/channels/lantian/SXshangyu1/720p.m3u8?zzhed
+#EXTINF:-1 group-title="GitHub蒐集" tvg-name="中國藍新聞",中國藍新聞
+http://ali-m-l.cztv.com/channels/lantian/channel009/1080p.m3u8
+#EXTINF:-1 group-title="GitHub蒐集" tvg-name="嵊州新聞綜合",嵊州新聞綜合
+http://l.cztvcloud.com/channels/lantian/SXshengzhou1/720p.m3u8?zzhed
+#EXTINF:-1 group-title="GitHub蒐集" tvg-name="平湖新聞綜合",平湖新聞綜合
+http://l.cztvcloud.com/channels/lantian/SXpinghu1/720p.m3u8?zzhed
+#EXTINF:-1 group-title="GitHub蒐集" tvg-name="平湖民生休閒",平湖民生休閒
+http://l.cztvcloud.com/channels/lantian/SXpinghu2/720p.m3u8?zzhed
+#EXTINF:-1 group-title="GitHub蒐集" tvg-name="數碼時代",數碼時代
+http://ali-m-l.cztv.com/channels/lantian/channel012/1080p.m3u8
+#EXTINF:-1 group-title="GitHub蒐集" tvg-name="武義新聞綜合",武義新聞綜合
+http://l.cztvcloud.com/channels/lantian/SXwuyi1/720p.m3u8?zzhed
+#EXTINF:-1 group-title="GitHub蒐集" tvg-name="浙江國際",浙江國際
+http://ali-m-l.cztv.com/channels/lantian/channel010/1080p.m3u8
+#EXTINF:-1 group-title="GitHub蒐集" tvg-name="浙江少兒",浙江少兒
+http://ali-m-l.cztv.com/channels/lantian/channel008/1080p.m3u8
+#EXTINF:-1 group-title="GitHub蒐集" tvg-name="浙江教科影院",浙江教科影院
+http://ali-m-l.cztv.com/channels/lantian/channel004/1080p.m3u8
+#EXTINF:-1 group-title="GitHub蒐集" tvg-name="浙江新聞",浙江新聞
+http://ali-m-l.cztv.com/channels/lantian/channel007/1080p.m3u8
+#EXTINF:-1 group-title="GitHub蒐集" tvg-name="浙江民生休閒",浙江民生休閒
+http://ali-m-l.cztv.com/channels/lantian/channel006/1080p.m3u8
+#EXTINF:-1 group-title="GitHub蒐集" tvg-name="浙江經濟生活",浙江經濟生活
+http://ali-m-l.cztv.com/channels/lantian/channel003/1080p.m3u8
+#EXTINF:-1 group-title="GitHub蒐集" tvg-name="浙江衛視",浙江衛視
+http://ali-m-l.cztv.com/channels/lantian/channel001/1080p.m3u8
+#EXTINF:-1 group-title="GitHub蒐集" tvg-name="浙江錢江都市",浙江錢江都市
+http://ali-m-l.cztv.com/channels/lantian/channel002/1080p.m3u8
+#EXTINF:-1 group-title="GitHub蒐集" tvg-name="蕭山新聞綜合",蕭山新聞綜合
+http://l.cztvcloud.com/channels/lantian/SXxiaoshan1/720p.m3u8?zzhed
+#EXTINF:-1 group-title="GitHub蒐集" tvg-name="蕭山生活頻道",蕭山生活頻道
+http://l.cztvcloud.com/channels/lantian/SXxiaoshan2/720p.m3u8?zzhed
+#EXTINF:-1 group-title="GitHub蒐集" tvg-name="蘭溪新聞綜合",蘭溪新聞綜合
+http://l.cztvcloud.com/channels/lantian/SXlanxi1/720p.m3u8?zzhed
+#EXTINF:-1 group-title="GitHub蒐集" tvg-name="諸暨新聞綜合",諸暨新聞綜合
+http://l.cztvcloud.com/channels/lantian/SXzhuji3/720p.m3u8?zzhed
+#EXTINF:-1 group-title="GitHub蒐集" tvg-name="餘姚姚江文化",餘姚姚江文化
+http://l.cztvcloud.com/channels/lantian/SXyuyao3/720p.m3u8?zzhed
+#EXTINF:-1 group-title="GitHub蒐集" tvg-name="餘姚新聞綜合",餘姚新聞綜合
+http://l.cztvcloud.com/channels/lantian/SXyuyao1/720p.m3u8?zzhed
+#EXTINF:-1 group-title="GitHub蒐集" tvg-name="餘杭未來E頻道",餘杭未來E頻道
+http://l.cztvcloud.com/channels/lantian/SXyuhang3/720p.m3u8?zzhed
+#EXTINF:-1 group-title="GitHub蒐集" tvg-name="餘杭綜合頻道",餘杭綜合頻道
+http://l.cztvcloud.com/channels/lantian/SXyuhang1/720p.m3u8?zzhed
+#EXTINF:-1 group-title="列表更新時間" tvg-name="20261012 08:52:09",20261012 08:52:09
+https://cdn.jsdelivr.net/gh/feiyang666999/testvideo/time/time.mp4
+#EXTINF:-1 group-title="地方" tvg-name="興隆綜合",興隆綜合
+https://jwcdnqx.hebyun.com.cn/live/xlzh/1500k/tzwj_video.m3u8
+#EXTINF:-1 group-title="央影片道" tvg-name="CGTN俄語",CGTN俄語
+https://0472.org/hls/cgtne.m3u8
+#EXTINF:-1 group-title="央影片道" tvg-name="CGTN法語",CGTN法語
+https://0472.org/hls/cgtnf.m3u8
+#EXTINF:-1 group-title="央影片道" tvg-name="CGTN英語",CGTN英語
+https://0472.org/hls/cgtn.m3u8
+#EXTINF:-1 group-title="央影片道" tvg-name="CGTN西語",CGTN西語
+https://0472.org/hls/cgtnx.m3u8
+#EXTINF:-1 group-title="央影片道" tvg-name="CGTN記錄",CGTN記錄
+https://0472.org/hls/cgtnd.m3u8
+#EXTINF:-1 group-title="央影片道" tvg-name="CGTN阿語",CGTN阿語
+https://0472.org/hls/cgtna.m3u8
+#EXTINF:-1 group-title="廣西" tvg-name="廣西衛視",廣西衛視
+https://hlscdn.liangtv.cn/live/0c4ef3a44b934cacb8b47121dfada66c/d7e04258157b480dae53883cc6f8123b.m3u8
+#EXTINF:-1 group-title="成人頻道" tvg-name="Anal",Anal
+http://cdn.adultiptv.net/anal.m3u8
+#EXTINF:-1 group-title="成人頻道" tvg-name="Asian",Asian
+http://cdn.adultiptv.net/asian.m3u8
+#EXTINF:-1 group-title="成人頻道" tvg-name="Big Ass",Big Ass
+http://cdn.adultiptv.net/bigass.m3u8
+#EXTINF:-1 group-title="成人頻道" tvg-name="Big Dick",Big Dick
+http://cdn.adultiptv.net/bigdick.m3u8
+#EXTINF:-1 group-title="成人頻道" tvg-name="Big Tits",Big Tits
+http://cdn.adultiptv.net/bigtits.m3u8
+#EXTINF:-1 group-title="成人頻道" tvg-name="Blonde",Blonde
+http://cdn.adultiptv.net/blonde.m3u8
+#EXTINF:-1 group-title="成人頻道" tvg-name="Blowjob",Blowjob
+http://cdn.adultiptv.net/blowjob.m3u8
+#EXTINF:-1 group-title="成人頻道" tvg-name="Brunette",Brunette
+http://cdn.adultiptv.net/brunette.m3u8
+#EXTINF:-1 group-title="成人頻道" tvg-name="Compilation",Compilation
+http://cdn.adultiptv.net/compilation.m3u8
+#EXTINF:-1 group-title="成人頻道" tvg-name="Cuckold",Cuckold
+http://cdn.adultiptv.net/cuckold.m3u8
+#EXTINF:-1 group-title="成人頻道" tvg-name="Fetish",Fetish
+http://cdn.adultiptv.net/fetish.m3u8
+#EXTINF:-1 group-title="成人頻道" tvg-name="Gangbang",Gangbang
+http://cdn.adultiptv.net/gangbang.m3u8
+#EXTINF:-1 group-title="成人頻道" tvg-name="Gay",Gay
+http://cdn.adultiptv.net/gay.m3u8
+#EXTINF:-1 group-title="成人頻道" tvg-name="Hardcore",Hardcore
+http://cdn.adultiptv.net/hardcore.m3u8
+#EXTINF:-1 group-title="成人頻道" tvg-name="Interracial",Interracial
+http://cdn.adultiptv.net/interracial.m3u8
+#EXTINF:-1 group-title="成人頻道" tvg-name="Latina",Latina
+http://cdn.adultiptv.net/latina.m3u8
+#EXTINF:-1 group-title="成人頻道" tvg-name="Lesbian",Lesbian
+http://cdn.adultiptv.net/lesbian.m3u8
+#EXTINF:-1 group-title="成人頻道" tvg-name="Live Cams",Live Cams
+http://cdn.adultiptv.net/livecams.m3u8
+#EXTINF:-1 group-title="成人頻道" tvg-name="MILF",MILF
+http://cdn.adultiptv.net/milf.m3u8
+#EXTINF:-1 group-title="成人頻道" tvg-name="POV",POV
+http://cdn.adultiptv.net/pov.m3u8
+#EXTINF:-1 group-title="成人頻道" tvg-name="Pornstar",Pornstar
+http://cdn.adultiptv.net/pornstar.m3u8
+#EXTINF:-1 group-title="成人頻道" tvg-name="Rough",Rough
+http://cdn.adultiptv.net/rough.m3u8
+#EXTINF:-1 group-title="成人頻道" tvg-name="Russian",Russian
+http://cdn.adultiptv.net/russian.m3u8
+#EXTINF:-1 group-title="成人頻道" tvg-name="Threesome",Threesome
+http://cdn.adultiptv.net/threesome.m3u8
+#EXTINF:-1 group-title="浙江頻道" tvg-name="之江紀錄",之江紀錄
+https://ali-m-l.cztv.com/channels/lantian/channel012/1080p.m3u8
+#EXTINF:-1 group-title="浙江頻道" tvg-name="浙江國際",浙江國際
+https://ali-m-l.cztv.com/channels/lantian/channel010/1080p.m3u8
+#EXTINF:-1 group-title="浙江頻道" tvg-name="浙江少兒",浙江少兒
+https://ali-m-l.cztv.com/channels/lantian/channel008/1080p.m3u8
+#EXTINF:-1 group-title="浙江頻道" tvg-name="浙江教科",浙江教科
+https://ali-m-l.cztv.com/channels/lantian/channel004/1080p.m3u8
+#EXTINF:-1 group-title="浙江頻道" tvg-name="浙江新聞",浙江新聞
+https://ali-m-l.cztv.com/channels/lantian/channel007/1080p.m3u8
+#EXTINF:-1 group-title="浙江頻道" tvg-name="浙江民生",浙江民生
+https://ali-m-l.cztv.com/channels/lantian/channel006/1080p.m3u8
+#EXTINF:-1 group-title="浙江頻道" tvg-name="浙江經濟",浙江經濟
+https://ali-m-l.cztv.com/channels/lantian/channel003/1080p.m3u8
+#EXTINF:-1 group-title="浙江頻道" tvg-name="浙江錢江",浙江錢江
+https://ali-m-l.cztv.com/channels/lantian/channel002/1080p.m3u8
+#EXTINF:-1 group-title="海南" tvg-name="海南衛視",海南衛視
+https://livelyws1.chinamcache.com/lyws/newlive_zb03.m3u8?auth_key=1767148001-0-0-0650c6542c331540df214a79a09a2356
+#EXTINF:-1 group-title="港澳臺" tvg-name="EF運通",EF運通
+https://raw.githubusercontent.com/ChiSheng9/iptv/master/TV06.m3u8
+#EXTINF:-1 group-title="港澳臺" tvg-name="MOMO購物1臺",MOMO購物1臺
+https://raw.githubusercontent.com/ChiSheng9/iptv/master/TV04.m3u8
+#EXTINF:-1 group-title="港澳臺" tvg-name="MOMO購物2臺",MOMO購物2臺
+https://raw.githubusercontent.com/ChiSheng9/iptv/master/TV05.m3u8
+#EXTINF:-1 group-title="港澳臺" tvg-name="TVBS亞洲",TVBS亞洲
+http://38.64.72.148:80/hls/modn/list/4005/playlist.m3u8
+#EXTINF:-1 group-title="港澳臺" tvg-name="TVBS亞洲",TVBS亞洲
+http://38.64.72.148:80/hls/modn/list/4005/chunklist0.m3u8
+#EXTINF:-1 group-title="港澳臺" tvg-name="TVBS亞洲",TVBS亞洲
+http://38.64.72.148:80/hls/modn/list/4005/chunklist1.m3u8
+#EXTINF:-1 group-title="港澳臺" tvg-name="The KPOP",The KPOP
+https://git.io/JgYAE
+#EXTINF:-1 group-title="港澳臺" tvg-name="Viva 美好購物1臺",Viva 美好購物1臺
+https://raw.githubusercontent.com/ChiSheng9/iptv/master/TV54.m3u8
+#EXTINF:-1 group-title="港澳臺" tvg-name="Viva 美好購物2臺",Viva 美好購物2臺
+https://raw.githubusercontent.com/ChiSheng9/iptv/master/TV55.m3u8
+#EXTINF:-1 group-title="港澳臺" tvg-name="三立NEWS+",三立NEWS+
+https://raw.githubusercontent.com/ChiSheng9/iptv/master/TV32.m3u8
+#EXTINF:-1 group-title="港澳臺" tvg-name="三立iNEWS",三立iNEWS
+https://raw.githubusercontent.com/ChiSheng9/iptv/master/TV01.m3u8
+#EXTINF:-1 group-title="港澳臺" tvg-name="中視",中視
+https://raw.githubusercontent.com/ChiSheng9/iptv/master/TV42.m3u8
+#EXTINF:-1 group-title="港澳臺" tvg-name="中視新聞",中視新聞
+https://raw.githubusercontent.com/ChiSheng9/iptv/master/TV09.m3u8
+#EXTINF:-1 group-title="港澳臺" tvg-name="人間衛視",人間衛視
+http://61.216.67.119:1935/bltvhd/bltv1/chunklist_w1266569526.m3u
+#EXTINF:-1 group-title="港澳臺" tvg-name="人間衛視",人間衛視
+http://61.216.67.119:1935/bltvhd/bltv1/chunklist_w1266569526.m3u8
+#EXTINF:-1 group-title="港澳臺" tvg-name="人間衛視",人間衛視
+https://5ddce30eb4b55.streamlock.net/bltvhd/bltv1/playlist.m3u8
+#EXTINF:-1 group-title="港澳臺" tvg-name="人間衛視",人間衛視
+https://5ddce30eb4b55.streamlock.net/bltvhd/bltv1/chunklist_w511254805.m3u8
+#EXTINF:-1 group-title="港澳臺" tvg-name="原住民族電視臺",原住民族電視臺
+https://raw.githubusercontent.com/ChiSheng9/iptv/master/TV35.m3u8
+#EXTINF:-1 group-title="港澳臺" tvg-name="唯心電視",唯心電視
+http://mobile.ccdntech.com/transcoder/_definst_/vod164_Live/live/chunklist_w1177047531.m3u8
+#EXTINF:-1 group-title="港澳臺" tvg-name="唯心電視",唯心電視
+http://mobile.ccdntech.com/transcoder/_definst_/vod164_Live/live/playlist.m3u8
+#EXTINF:-1 group-title="港澳臺" tvg-name="大愛1臺",大愛1臺
+https://raw.githubusercontent.com/ChiSheng9/iptv/master/TV30.m3u8
+#EXTINF:-1 group-title="港澳臺" tvg-name="大愛1臺",大愛1臺
+https://raw.githubusercontent.com/ChiSheng9/iptv/master/TV48.m3u8
+#EXTINF:-1 group-title="港澳臺" tvg-name="大愛2臺",大愛2臺
+https://raw.githubusercontent.com/ChiSheng9/iptv/master/TV47.m3u8
+#EXTINF:-1 group-title="港澳臺" tvg-name="大立電視臺",大立電視臺
+http://www.dalitv.com.tw:4568/live/dali/index.m3u8
+#EXTINF:-1 group-title="港澳臺" tvg-name="寰宇新聞",寰宇新聞
+https://raw.githubusercontent.com/ChiSheng9/iptv/master/TV02.m3u8
+#EXTINF:-1 group-title="港澳臺" tvg-name="幸福空間居家臺",幸福空間居家臺
+https://raw.githubusercontent.com/ChiSheng9/iptv/master/TV41.m3u8
+#EXTINF:-1 group-title="港澳臺" tvg-name="東森財經",東森財經
+https://raw.githubusercontent.com/ChiSheng9/iptv/master/TV03.m3u8
+#EXTINF:-1 group-title="港澳臺" tvg-name="東森購物2",東森購物2
+https://raw.githubusercontent.com/ChiSheng9/iptv/master/TV19.m3u8
+#EXTINF:-1 group-title="港澳臺" tvg-name="東森購物3",東森購物3
+https://raw.githubusercontent.com/ChiSheng9/iptv/master/TV18.m3u8
+#EXTINF:-1 group-title="港澳臺" tvg-name="東森超視34.5",東森超視34.5
+http://38.64.72.148:80/hls/modn/list/2013/chunklist1.m3u8
+#EXTINF:-1 group-title="港澳臺" tvg-name="民視新聞",民視新聞
+https://raw.githubusercontent.com/ChiSheng9/iptv/master/TV17.m3u8
+#EXTINF:-1 group-title="港澳臺" tvg-name="民視新聞",民視新聞
+http://38.64.72.148:80/hls/modn/list/4012/chunklist0.m3u8
+#EXTINF:-1 group-title="港澳臺" tvg-name="民視新聞",民視新聞
+http://38.64.72.148:80/hls/modn/list/4012/chunklist1.m3u8
+#EXTINF:-1 group-title="港澳臺" tvg-name="民視新聞",民視新聞
+http://38.64.72.148/hls/modn/list/4012/chunklist0.m3u8
+#EXTINF:-1 group-title="港澳臺" tvg-name="民視新聞",民視新聞
+http://38.64.72.148/hls/modn/list/4012/chunklist1.m3u8
+#EXTINF:-1 group-title="港澳臺" tvg-name="民視新聞",民視新聞
+http://38.64.72.148/hls/modn/list/4012/playlist.m3u8
+#EXTINF:-1 group-title="港澳臺" tvg-name="澳門蓮花",澳門蓮花
+http://anren.live/HK/BiIOU11uLA.m3u8
+#EXTINF:-1 group-title="港澳臺" tvg-name="臺視新聞",臺視新聞
+https://raw.githubusercontent.com/ChiSheng9/iptv/master/TV25.m3u8
+#EXTINF:-1 group-title="港澳臺" tvg-name="臺視新聞",臺視新聞
+http://38.64.72.148:80/hls/modn/list/4013/chunklist0.m3u8
+#EXTINF:-1 group-title="港澳臺" tvg-name="臺視新聞",臺視新聞
+http://38.64.72.148:80/hls/modn/list/4013/chunklist1.m3u8
+#EXTINF:-1 group-title="港澳臺" tvg-name="臺視新聞",臺視新聞
+http://38.64.72.148/hls/modn/list/4013/chunklist0.m3u8
+#EXTINF:-1 group-title="港澳臺" tvg-name="臺視新聞",臺視新聞
+http://38.64.72.148/hls/modn/list/4013/chunklist1.m3u8
+#EXTINF:-1 group-title="港澳臺" tvg-name="臺視新聞",臺視新聞
+http://38.64.72.148/hls/modn/list/4013/playlist.m3u8
+#EXTINF:-1 group-title="港澳臺" tvg-name="華視綜合娛樂",華視綜合娛樂
+https://raw.githubusercontent.com/ChiSheng9/iptv/master/TV12.m3u8
+#EXTINF:-1 group-title="港澳臺" tvg-name="鏡新聞Mnews",鏡新聞Mnews
+https://raw.githubusercontent.com/ChiSheng9/iptv/master/TV70.m3u8
+#EXTINF:-1 group-title="港澳臺" tvg-name="鳳凰中文",鳳凰中文
+http://playtv-live.ifeng.com/live/06OLEGEGM4G.m3u8
+#EXTINF:-1 group-title="港澳臺" tvg-name="鳳凰中文臺",鳳凰中文臺
+https://playtv-live.ifeng.com/live/06OLEGEGM4G.m3u8
+#EXTINF:-1 group-title="港澳臺" tvg-name="鳳凰資訊",鳳凰資訊
+http://playtv-live.ifeng.com/live/06OLEEWQKN4.m3u8?
+#EXTINF:-1 group-title="港澳臺" tvg-name="鳳凰資訊",鳳凰資訊
+http://playtv-live.ifeng.com/live/06OLEEWQKN4.m3u8
+#EXTINF:-1 group-title="港澳臺" tvg-name="鳳凰資訊",鳳凰資訊
+https://playtv-live.ifeng.com/live/06OLEEWQKN4.m3u8
