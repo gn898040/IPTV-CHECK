@@ -228,11 +228,11 @@ https://raw.githubusercontent.com/ChiSheng9/iptv/master/TV18.m3u8
 #EXTINF:-1 group-title="港澳臺" tvg-name="東森超視34.5",東森超視34.5
 http://38.64.72.148:80/hls/modn/list/2013/chunklist1.m3u8
 #EXTINF:-1 group-title="港澳臺" tvg-name="民視新聞",民視新聞
-https://raw.githubusercontent.com/ChiSheng9/iptv/master/TV17.m3u8
-#EXTINF:-1 group-title="港澳臺" tvg-name="民視新聞",民視新聞
 http://38.64.72.148:80/hls/modn/list/4012/chunklist0.m3u8
 #EXTINF:-1 group-title="港澳臺" tvg-name="民視新聞",民視新聞
 http://38.64.72.148:80/hls/modn/list/4012/chunklist1.m3u8
+#EXTINF:-1 group-title="港澳臺" tvg-name="民視新聞",民視新聞
+https://raw.githubusercontent.com/ChiSheng9/iptv/master/TV17.m3u8
 #EXTINF:-1 group-title="港澳臺" tvg-name="民視新聞",民視新聞
 http://38.64.72.148/hls/modn/list/4012/chunklist0.m3u8
 #EXTINF:-1 group-title="港澳臺" tvg-name="民視新聞",民視新聞
@@ -242,9 +242,9 @@ http://38.64.72.148/hls/modn/list/4012/playlist.m3u8
 #EXTINF:-1 group-title="港澳臺" tvg-name="澳門蓮花",澳門蓮花
 http://anren.live/HK/BiIOU11uLA.m3u8
 #EXTINF:-1 group-title="港澳臺" tvg-name="臺視新聞",臺視新聞
-https://raw.githubusercontent.com/ChiSheng9/iptv/master/TV25.m3u8
-#EXTINF:-1 group-title="港澳臺" tvg-name="臺視新聞",臺視新聞
 http://38.64.72.148:80/hls/modn/list/4013/chunklist0.m3u8
+#EXTINF:-1 group-title="港澳臺" tvg-name="臺視新聞",臺視新聞
+https://raw.githubusercontent.com/ChiSheng9/iptv/master/TV25.m3u8
 #EXTINF:-1 group-title="港澳臺" tvg-name="臺視新聞",臺視新聞
 http://38.64.72.148:80/hls/modn/list/4013/chunklist1.m3u8
 #EXTINF:-1 group-title="港澳臺" tvg-name="臺視新聞",臺視新聞
