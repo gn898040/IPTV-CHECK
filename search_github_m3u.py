@@ -5,7 +5,7 @@ import time
 from datetime import datetime, timezone
 
 # --- 設定區 ---
-MAX_DAYS_OLD = 30               # 限制條件：30天內更新的檔案
+MAX_DAYS_OLD = 15               # 限制條件：30天內更新的檔案
 OUTPUT_M3U = "Github_Collected.m3u"
 OUTPUT_REPORT = "Report.txt"     # 統計報告輸出檔名
 # 搜尋包含任一詞的結果 (如果是 GitHub API，支援 OR 語法)
