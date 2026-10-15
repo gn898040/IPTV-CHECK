@@ -1,129 +1,204 @@
 ==========================================
       📊 群組分類 (Group Title) 統計表
 ==========================================
- ► 其他 : 12186 條串流
- ► 卫视频道 : 2717 條串流
- ► 央视卫视 : 1929 條串流
- ► 央视频道 : 1643 條串流
- ► 衛影片道 : 263 條串流
- ► 地方频道 : 248 條串流
- ► 央影片道 : 194 條串流
- ► 卫视 : 158 條串流
- ► 北京联通 : 150 條串流
- ► 数字付费 : 124 條串流
- ► 港·澳·台 : 122 條串流
- ► 浙江頻道 : 116 條串流
- ► 少儿动画 : 111 條串流
- ► 央视 : 108 條串流
- ► 港澳臺 : 100 條串流
- ► 广东频道 : 91 條串流
- ► 直播中国 : 79 條串流
- ► X頻道 : 73 條串流
- ► TW2頻道 : 71 條串流
- ► 香港频道 : 69 條串流
- ► 付费频道 : 66 條串流
- ► MTV : 63 條串流
- ► 地方台 : 54 條串流
- ► 少儿频道 : 54 條串流
- ► 廣東頻道 : 35 條串流
- ► 地方 : 34 條串流
- ► 影视频道 : 29 條串流
- ► Hong Kong : 26 條串流
- ► 四川頻道 : 21 條串流
- ► 中央电视 : 20 條串流
- ► 兒童頻道 : 18 條串流
- ► 電影 : 16 條串流
- ► 國際臺 : 15 條串流
- ► 港澳台 : 15 條串流
- ► 吉林頻道 : 14 條串流
- ► 江蘇頻道 : 14 條串流
- ► 天津频道 : 14 條串流
- ► 山东电信 : 13 條串流
- ► 黑龍江頻道 : 13 條串流
- ► 湖南頻道 : 13 條串流
- ► TW : 12 條串流
- ► TVPass : 12 條串流
- ► 广东 : 12 條串流
- ► 直播中國 : 12 條串流
- ► 福建頻道 : 11 條串流
- ► 山東頻道 : 11 條串流
- ► 河北頻道 : 11 條串流
- ► 海南頻道 : 11 條串流
- ► 江苏 : 10 條串流
- ► 遼寧頻道 : 10 條串流
- ► 4K频道 : 9 條串流
- ► 山西頻道 : 9 條串流
- ► 安徽 : 9 條串流
- ► 黑龙江 : 9 條串流
- ► Canada : 8 條串流
- ► UDPTV : 8 條串流
- ► 體育頻道 : 8 條串流
- ► FM广播 : 8 條串流
- ► 安徽頻道 : 8 條串流
- ► 湖北頻道 : 8 條串流
- ► 上海頻道 : 8 條串流
- ► samsung : 7 條串流
- ► 总台 : 7 條串流
- ► 山东 : 7 條串流
- ► 廣西頻道 : 7 條串流
+ ► BRAZIL : 845 條串流
+ ► 📡卫视频道 : 455 條串流
+ ► ITALY : 436 條串流
+ ► 📺央视频道 : 310 條串流
+ ► 其他 : 281 條串流
+ ► VOD ITALY : 154 條串流
+ ► CINEMA EM INGLÊS : 137 條串流
+ ► INFANTIS EM INGLÊS : 117 條串流
+ ► VARIEDADES EM INGLÊS : 80 條串流
+ ► ESPORTES EM INGLÊS : 80 條串流
+ ► 央视 : 70 條串流
+ ► ESPORTES EM INGLÊS: LUTAS : 63 條串流
+ ► GREECE : 62 條串流
+ ► RUSSIA : 58 條串流
+ ► UK : 55 條串流
+ ► SPAIN : 51 條串流
+ ► DOCUMENTÁRIOS EM INGLÊS : 51 條串流
+ ► UKRAINE : 47 條串流
+ ► MÚSICA : 46 條串流
+ ► 浙江 : 45 條串流
+ ► VARIEDADES EM COREANO : 42 條串流
+ ► MONGOLIA : 41 條串流
+ ► HUMOR EM INGLÊS : 38 條串流
+ ► HUNGARY : 36 條串流
+ ► CINEMA EM ESPANHOL : 36 條串流
+ ► REALITY SHOWS EM INGLÊS : 36 條串流
+ ► GERMANY : 35 條串流
+ ► NEWS : 35 條串流
+ ► UNITED ARAB EMIRATES : 35 條串流
+ ► ESPORTES EM INGLÊS: AUTOMOBILISMO : 34 條串流
+ ► INDIA : 32 條串流
+ ► FRANCE : 31 條串流
+ ► NORTH MACEDONIA : 31 條串流
+ ► FINLAND : 29 條串流
+ ► VARIEDADES EM VÁRIOS IDIOMAS : 28 條串流
+ ► ESTADOS UNIDOS : 27 條串流
+ ► CZECH REPUBLIC : 27 條串流
+ ► ARGENTINA : 26 條串流
+ ► AUSTRALIA : 26 條串流
+ ► VOD MOVIES (EN) : 26 條串流
+ ► CROATIA : 26 條串流
+ ► IRAN : 26 條串流
+ ► INFANTIS EM ESPANHOL : 26 條串流
+ ► CHILE : 24 條串流
+ ► CELEBRIDADES E CULTURA POP EM INGLÊS : 23 條串流
+ ► KOREA : 22 條串流
+ ► Películas : 22 條串流
+ ► VARIEDADES EM ESPANHOL : 21 條串流
+ ► VIDEOGAME : 21 條串流
+ ► 黑龙江 : 21 條串流
+ ► 辽宁 : 21 條串流
+ ► NOTÍCIAS EM FRANCÊS : 20 條串流
+ ► CANADA : 20 條串流
+ ► SOMALIA : 19 條串流
+ ► 福建 : 19 條串流
+ ► 安徽 : 19 條串流
+ ► BELARUS : 18 條串流
+ ► IRELAND : 18 條串流
+ ► CHINA : 18 條串流
+ ► 广东 : 18 條串流
+ ► 湖南 : 18 條串流
+ ► VARIEDADES E NOTÍCIAS EM ÁRABE : 17 條串流
+ ► BOSNIA AND HERZEGOVINA : 17 條串流
+ ► NOTÍCIAS EM INGLÊS : 17 條串流
+ ► ESPORTES EM ESPANHOL : 17 條串流
+ ► 🌊港·澳·台 : 17 條串流
+ ► VARIEDADES EM RUSSO : 16 條串流
+ ► REALITY SHOWS EM INGLÊS: CRIMES E JULGAMENTOS : 16 條串流
+ ► CULINÁRIA EM INGLÊS : 16 條串流
+ ► TURKEY : 16 條串流
+ ► NOVELAS E SÉRIES EM INGLÊS : 15 條串流
+ ► ALBANIA : 15 條串流
+ ► PORTUGAL : 15 條串流
+ ► 香港 : 15 條串流
+ ► 云南 : 15 條串流
+ ► 江苏 : 15 條串流
+ ► VARIEDADES EM TURCO : 14 條串流
+ ► MEXICO : 14 條串流
+ ► SWEDEN : 14 條串流
+ ► SAUDI ARABIA : 14 條串流
+ ► EXTREMA DIREITA | EUA : 14 條串流
+ ► ROMANIA : 14 條串流
+ ► VARIEDADES EM FARSI : 14 條串流
+ ► LEBANON : 13 條串流
+ ► IRAQ : 13 條串流
+ ► TAIWAN : 13 條串流
+ ► SLOVAKIA : 13 條串流
+ ► 日本 / JAPAN : 13 條串流
+ ► NETHERLANDS : 13 條串流
+ ► 四川 : 13 條串流
+ ► NIGERIA : 12 條串流
+ ► EGYPT : 12 條串流
+ ► QATAR : 12 條串流
+ ► VARIEDADES E NOTÍCIAS EM ITALIANO : 12 條串流
+ ► MÚSICA INSTRUMENTAL E SOM AMBIENTE : 12 條串流
+ ► DENMARK : 12 條串流
+ ► AZERBAIJAN : 11 條串流
+ ► CRISTIANISMO EM INGLÊS : 11 條串流
+ ► BULGARIA : 11 條串流
+ ► GEORGIA : 11 條串流
+ ► 新疆 : 11 條串流
+ ► BELGIUM : 10 條串流
+ ► LITHUANIA : 10 條串流
+ ► VARIEDADES E NOTÍCIAS EM ALEMÃO : 10 條串流
+ ► REALITY E GAME SHOWS EM ESPANHOL : 10 條串流
+ ► NOTÍCIAS EM OUTROS IDIOMAS : 9 條串流
+ ► VENEZUELA : 9 條串流
+ ► NOTÍCIAS EM INGLÊS: DINHEIRO : 9 條串流
+ ► ISLAMISMO : 9 條串流
+ ► AUSTRIA : 9 條串流
+ ► 天津 : 9 條串流
+ ► 山东 : 9 條串流
+ ► 广西 : 9 條串流
+ ► ISRAEL : 8 條串流
+ ► TURKMENISTAN : 8 條串流
+ ► NEWS (AR) : 8 條串流
+ ► 台湾 : 8 條串流
+ ► CRISTIANISMO EM ESPANHOL : 8 條串流
+ ► VARIEDADES E NOTÍCIAS EM GREGO : 8 條串流
+ ► ESTONIA : 8 條串流
+ ► TELEVENDAS EM INGLÊS : 8 條串流
+ ► PETS EM INGLÊS : 8 條串流
+ ► MÚSICA: KARAOKÊ : 8 條串流
+ ► 海南 : 8 條串流
+ ► 河北 : 8 條串流
+ ► PERU : 7 條串流
+ ► CYPRUS : 7 條串流
+ ► CINEMA EM FRANCÊS : 7 條串流
+ ► VARIEDADES EM CHINÊS : 7 條串流
+ ► CINEMA EM OUTROS IDIOMAS : 7 條串流
+ ► SERBIA : 7 條串流
  ► 湖北 : 7 條串流
- ► LGTV : 6 條串流
- ► 紀錄片 : 6 條串流
- ► 新疆頻道 : 6 條串流
- ► 江西頻道 : 6 條串流
- ► 天津頻道 : 6 條串流
- ► 广西 : 6 條串流
- ► 河北 : 6 條串流
- ► 河南 : 6 條串流
- ► 福建 : 6 條串流
- ► 测试台 : 6 條串流
- ► 贵州 : 6 條串流
- ► 陕西 : 6 條串流
- ► 外文台 : 5 條串流
- ► 電視劇 : 5 條串流
- ► 新疆 : 5 條串流
- ► 其他频道 : 5 條串流
+ ► 江西 : 7 條串流
+ ► WEATHER : 6 條串流
+ ► BUSINESS : 6 條串流
+ ► VARIEDADES EM FRANCÊS : 6 條串流
+ ► MOLDOVA : 6 條串流
+ ► NEWS (ES) : 6 條串流
+ ► TRINIDAD : 6 條串流
+ ► NORWAY : 6 條串流
+ ► SWITZERLAND : 6 條串流
+ ► 山西 : 6 條串流
+ ► 甘肃 : 6 條串流
+ ► GAME SHOWS EM INGLÊS : 5 條串流
+ ► Misceláneos : 5 條串流
+ ► MACAU : 5 條串流
+ ► NOVELAS E SÉRIES EM ESPANHOL : 5 條串流
+ ► KENYA : 5 條串流
+ ► CAÇA; PESCA E RODEIO EM INGLÊS : 5 條串流
+ ► HONG KONG : 5 條串流
+ ► LATVIA : 5 條串流
  ► 吉林 : 5 條串流
- ► 重慶頻道 : 5 條串流
- ► 湖南 : 5 條串流
- ► 辽宁 : 5 條串流
- ► 公告 : 4 條串流
- ► 內蒙頻道 : 4 條串流
- ► 内蒙古 : 4 條串流
- ► 宁夏 : 4 條串流
- ► 甘肃 : 4 條串流
- ► 重庆 : 4 條串流
- ► Reality TV : 3 條串流
- ► 四川 : 3 條串流
- ► 江西 : 3 條串流
- ► 浙江 : 3 條串流
- ► 海南 : 3 條串流
- ► 青海 : 3 條串流
- ► Comedy : 2 條串流
- ► English : 2 條串流
- ► 掃描頻道 : 2 條串流
- ► 上海 : 2 條串流
- ► 春晚 : 2 條串流
- ► 戲曲頻道 : 2 條串流
- ► 河南頻道 : 2 條串流
- ► 更新时间 : 1 條串流
- ► distrotv : 1 條串流
- ► 电影频道 : 1 條串流
- ► Home & Food : 1 條串流
- ► News & Opinion : 1 條串流
- ► GitHub搜集 : 1 條串流
- ► Quốc tế : 1 條串流
- ► United States : 1 條串流
- ► tubi_playlist : 1 條串流
- ► xumo_playlist : 1 條串流
- ► 貴州頻道 : 1 條串流
- ► NewTV : 1 條串流
- ► 北京 : 1 條串流
- ► 山西 : 1 條串流
- ► 西藏 : 1 條串流
- ► 收音機頻道 : 1 條串流
+ ► 陕西 : 5 條串流
+ ► RADIOS : 4 條串流
+ ► COSTA RICA : 4 條串流
+ ► HUMOR E PETS EM ESPANHOL : 4 條串流
+ ► 🇧🇴 Bolivia : 4 條串流
+ ► MARATONA DE EPISÓDIOS EM ESPANHOL : 4 條串流
+ ► MARATONA DE EPISÓDIOS EM INGLÊS : 4 條串流
+ ► MONTENEGRO : 4 條串流
+ ► 北京 : 4 條串流
+ ► 西藏 : 4 條串流
+ ► 青海 : 4 條串流
+ ► ICELAND : 3 條串流
+ ► ARMENIA : 3 條串流
+ ► KAZAKHSTAN : 3 條串流
+ ► INDONESIA : 3 條串流
+ ► DOCUMENTARIES (EN) : 3 條串流
+ ► LUXEMBOURG : 3 條串流
+ ► DOCUMENTÁRIOS EM ALEMÃO : 3 條串流
+ ► MALTA : 3 條串流
+ ► 内蒙古 : 3 條串流
+ ► 宁夏 : 3 條串流
+ ► 河南 : 3 條串流
+ ► 贵州 : 3 條串流
+ ► 重庆 : 3 條串流
+ ► VARIEDADES EM UCRANIANO : 2 條串流
+ ► PARAGUAY : 2 條串流
+ ► DOCUMENTÁRIOS EM ESPANHOL : 2 條串流
+ ► NORTH KOREA : 2 條串流
+ ► GREENLAND : 2 條串流
+ ► FAROE ISLANDS : 2 條串流
+ ► MONACO : 2 條串流
+ ► SAN MARINO : 2 條串流
+ ► CHAD : 2 條串流
+ ► 🕘️更新时间 : 1 條串流
+ ► DOCUMENTARIES (AR) : 1 條串流
+ ► ANDORRA : 1 條串流
+ ► POLAND : 1 條串流
+ ► DOMINICAN REPUBLIC : 1 條串流
+ ► NOVELAS E SÉRIES EM ALEMÃO : 1 條串流
+ ► NOVELAS E SÉRIES EM ITALIANO : 1 條串流
+ ► SLOVENIA : 1 條串流
+ ► Música : 1 條串流
+ ► MUSIC (EN) : 1 條串流
+ ► KOSOVO : 1 條串流
 ==========================================
-總計不重複頻道數: 12258 個
-總計串流來源網址: 21522 條
-更新時間 (UTC): 2026-10-15 02:33:15
+總計不重複頻道數: 4275 個
+總計串流來源網址: 5571 條
+更新時間 (UTC): 2026-10-15 03:15:13
 ==========================================
