@@ -9,7 +9,7 @@ MAX_DAYS_OLD = 15               # 限制條件：30天內更新的檔案
 OUTPUT_M3U = "Github_Collected.m3u"
 OUTPUT_REPORT = "Report.txt"     # 統計報告輸出檔名
 # 搜尋包含任一詞的結果 (如果是 GitHub API，支援 OR 語法)
-SEARCH_QUERY = "直播源 OR IPTV OR m3u"         # 限制條件：搜尋關鍵字
+SEARCH_QUERY = "直播源 OR IPTV OR m3u -user:gn898040"         # 限制條件：搜尋關鍵字
 
 # 原有過濾條件
 EXCLUDE_STREAM_PLATFORMS = [
