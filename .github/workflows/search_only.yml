@@ -1,7 +1,9 @@
 name: Pure Search Github M3U
 
 on:
-  workflow_dispatch:      # 僅提供手動點擊按鈕觸發
+  schedule:
+    - cron: '0 16 * * *'  # 每天自動執行
+  workflow_dispatch:      # 允許手動觸發
 
 permissions:
   contents: write
