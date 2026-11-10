@@ -1,7 +1,1 @@
 #EXTM3U
-#EXTINF:-1 group-title="港澳臺" tvg-name="TTV News",TTV News
-https://live.wcetv.com/hls/master-ttvnews.m3u8
-#EXTINF:-1 group-title="港澳臺" tvg-name="Taiwan Indigenous TV",Taiwan Indigenous TV
-https://streamipcfapp.akamaized.net/live/_definst_/live_720/key_b1500.m3u8
-#EXTINF:-1 group-title="港澳臺" tvg-name="三立新聞",三立新聞
-https://raw.githubusercontent.com/ChiSheng9/iptv/master/TV32.m3u8
